@@ -1,0 +1,15 @@
+.image-input-container {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-input {
+  padding-bottom: 16px;
+}
+
+#image-canvas {
+  width: fit-content;
+  height: fit-content;
+}

@@ -1,0 +1,9 @@
+.action-panel-container {
+  flex: 2;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
