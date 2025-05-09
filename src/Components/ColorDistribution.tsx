@@ -1,3 +1,4 @@
+import React from "react";
 import { useEffect, useState } from "react";
 
 interface ColorDistributionProps {
@@ -13,6 +14,9 @@ const ColorDistribution = ({
   if (!imageAdded) return null;
 
   const [colorDistribution, setColorDistribution] = useState<{ [key: string]: number }>({})
+  // const [width, setWidth] = useState<number>(0);
+  // const [height, setHeight] = useState<number>(0);
+  const [totalPixels, setTotalPixels] = useState<number>(0);
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -23,6 +27,10 @@ const ColorDistribution = ({
     console.log('distribution useEffect')
 
     const canvas = canvasRef.current as HTMLCanvasElement;
+    // setWidth(canvas.width);
+    // setHeight(canvas.height);
+    setTotalPixels(canvas.width * canvas.height)
+
     calculateDistribution(canvas)
   }, [imageAdded]);
 
@@ -53,7 +61,9 @@ const ColorDistribution = ({
     console.log(Object.keys(colorCounter).length);
   }
 
-  const sortKeys = (dict : {[key: string]: number}, type: "desc" | "asc" = "desc") : string[] => {
+  const sortKeys = (dict: { [key: string]: number }, type: "desc" | "asc" = "desc"): string[] => {
+    console.log('sortKeys()')
+
     const entries = Object.entries(dict);
 
     if (type === "desc") {
@@ -62,21 +72,19 @@ const ColorDistribution = ({
       entries.sort((a, b) => a[1] - b[1]);
     }
 
-    const sortedKeys = entries.map(entry => entry[0]);
+    {/* TODO: batch pagination */}
+    const sortedKeys = entries.slice(0, 1000).map(entry => entry[0]);
+
+    console.log('finish key sort')
+
     return sortedKeys;
   }
 
   const getPercentage = (pixelCount: number) => {
-    if (!canvasRef.current) {
-      console.log('no canvas found on distribution');
-      return;
-    }
+    console.log('getPercentage()')
 
-    const {width, height} = canvasRef.current as HTMLCanvasElement;
-
-    const pixelRatio = pixelCount / (width * height);
-
-    return Math.round(pixelRatio * 10000) / 100
+    const pixelRatio = pixelCount / totalPixels;
+    return Math.round(pixelRatio * 10000) / 100;
   }
 
   return (
@@ -90,6 +98,7 @@ const ColorDistribution = ({
             <th id="percentage">Percentage</th>
           </tr>
 
+          {/* TODO: batch display */}
           {sortKeys(colorDistribution).map((color, idx) => {
             const count = colorDistribution[color];
             return (
@@ -112,4 +121,4 @@ const ColorDistribution = ({
   )
 }
 
-export default ColorDistribution;
+export default React.memo(ColorDistribution);

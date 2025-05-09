@@ -14,7 +14,7 @@ const ActionPanel = ({
   imageAdded,
   canvasRef,
 }: ActionPanelProps) => {
-  const [currentTab, setCurrentTab] = useState<string>('distribution');
+  const [currentTab, setCurrentTab] = useState<string>('floodfill');
 
   const handleTabClick = (tabPage: string) => {
     setCurrentTab(tabPage)
@@ -56,7 +56,10 @@ const ActionPanel = ({
           />
         </div>
         <div className={`${currentTab === 'floodfill' ? '' : 'hide'}`}>
-          <FloodFill />
+          <FloodFill
+            canvasRef={canvasRef}
+            imageAdded={imageAdded}
+          />
         </div>
         <div className={`${currentTab === 'quantization' ? '' : 'hide'}`}>
           <Quantization />
