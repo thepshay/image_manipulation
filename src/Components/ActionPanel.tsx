@@ -30,6 +30,7 @@ const ActionPanel = ({
       return (
         <ColorDistribution 
           canvasRef={canvasRef}
+          imageAdded={imageAdded}
         />
       )
     } else if (currentTab === 'floodfill') {

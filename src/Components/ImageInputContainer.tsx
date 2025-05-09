@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import '../assets/stylings/ImageInputContainer.css'
 
 interface ImageInputContainerProps {
@@ -11,7 +11,7 @@ const ImageInputContainer = ({
   imageAdded,
   setImageAdded,
   canvasRef,
-} : ImageInputContainerProps) => {
+}: ImageInputContainerProps) => {
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
 
@@ -35,7 +35,7 @@ const ImageInputContainer = ({
       console.log('no canvas found');
       return;
     }
-    
+
     const canvas = canvasRef.current as HTMLCanvasElement;
     const ctx = canvas.getContext('2d');
     const image = new Image();
@@ -46,7 +46,7 @@ const ImageInputContainer = ({
       const height = image.height;
       canvas.width = width;
       canvas.height = height;
-      (ctx as CanvasRenderingContext2D ).drawImage(image, 0, 0, width, height);
+      (ctx as CanvasRenderingContext2D).drawImage(image, 0, 0, width, height);
 
       setImageAdded(true);
     }
@@ -54,17 +54,21 @@ const ImageInputContainer = ({
 
   return (
     <div className='image-input-container'>
-      <input 
+      <input
         className='file-input'
-        type='file' 
+        type='file'
         accept='image/png, image/jpeg'
         onChange={handleFileInput}
       />
-      <canvas 
+      <canvas
         id='image-canvas'
         className={imageAdded ? "" : "hide"}
         ref={canvasRef}
-      ></canvas> 
+      ></canvas>
+      {canvasRef.current &&
+        <div>
+          {(canvasRef.current as HTMLCanvasElement).width} x {(canvasRef.current as HTMLCanvasElement).height}
+        </div>}
     </div>
   )
 }
