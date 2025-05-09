@@ -27,6 +27,8 @@ const ColorDistribution = ({
   }, [imageAdded]);
 
   const calculateDistribution = (canvas: HTMLCanvasElement) => {
+    console.log('calculateDistribution')
+
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
     const imageData = ctx.getImageData(0, 0, canvas.height, canvas.width) as ImageData;
@@ -88,11 +90,10 @@ const ColorDistribution = ({
             <th id="percentage">Percentage</th>
           </tr>
 
-          {sortKeys(colorDistribution).map((color) => {
+          {sortKeys(colorDistribution).map((color, idx) => {
             const count = colorDistribution[color];
-
             return (
-              <tr>
+              <tr key={idx}>
                 <td>{color}</td>
                 <td
                   style={{
