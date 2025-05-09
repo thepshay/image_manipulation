@@ -13,35 +13,11 @@ interface ActionPanelProps {
 const ActionPanel = ({
   imageAdded,
   canvasRef,
-} : ActionPanelProps) => {
+}: ActionPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('distribution');
 
   const handleTabClick = (tabPage: string) => {
     setCurrentTab(tabPage)
-  }
-
-  const displaySelectedPage = () => {
-
-    if (!imageAdded) {
-      return null;
-    }
-
-    if (currentTab === 'distribution') {
-      return (
-        <ColorDistribution 
-          canvasRef={canvasRef}
-          imageAdded={imageAdded}
-        />
-      )
-    } else if (currentTab === 'floodfill') {
-      return <FloodFill />
-    } else if (currentTab === 'quantization') {
-      return <Quantization />
-    } else if (currentTab === 'quantizedfloodfill') {
-      return <QuantizedFloodFill />
-    } else {
-      return null;
-    }
   }
 
   return (
@@ -73,7 +49,21 @@ const ActionPanel = ({
         </button>
       </div>
       <div>
-        {displaySelectedPage()}
+        <div className={`${currentTab === 'distribution' ? '' : 'hide'}`}>
+          <ColorDistribution
+            canvasRef={canvasRef}
+            imageAdded={imageAdded}
+          />
+        </div>
+        <div className={`${currentTab === 'floodfill' ? '' : 'hide'}`}>
+          <FloodFill />
+        </div>
+        <div className={`${currentTab === 'quantization' ? '' : 'hide'}`}>
+          <Quantization />
+        </div>
+        <div className={`${currentTab === 'quantizedfloodfill' ? '' : 'hide'}`}>
+          <QuantizedFloodFill />
+        </div>
       </div>
     </div>
   )
