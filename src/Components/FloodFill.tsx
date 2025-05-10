@@ -7,13 +7,30 @@ interface FloodFillProps {
   imageAdded: boolean;
 }
 
+
+
 const FloodFill = ({
   canvasRef,
   imageAdded,
 }: FloodFillProps) => {
 
-  const [floodColor, setFloodColor] = useState({ red: 0, green: 0, blue: 0 });
-  const [startingPosition, setStartingPosition] = useState({ x_coord: 0, y_coord: 0 });
+  const DEFAULT_RED = 0;
+  const DEFAULT_GREEN = 255;
+  const DEFAULT_BLUE = 0;
+
+  const DEFAULT_X = 100;
+  const DEFAULT_Y = 100;
+
+  // const DEFAULT_RED = 0;
+  // const DEFAULT_GREEN = 0;
+  // const DEFAULT_BLUE = 0;
+
+  // const DEFAULT_X = 0;
+  // const DEFAULT_Y = 0;
+
+
+  const [floodColor, setFloodColor] = useState({ red: DEFAULT_RED, green: DEFAULT_GREEN, blue: DEFAULT_BLUE });
+  const [startingPosition, setStartingPosition] = useState({ x_coord: DEFAULT_X, y_coord: DEFAULT_Y });
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
 
@@ -89,6 +106,19 @@ const FloodFill = ({
     floodImage({ floodColor, startingPosition, floodCanvasRef });
   }
 
+  const handleClickCanvas = (e: any) => {
+    const rect = e.target.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    console.log("x: " + x + " y: " + y);
+
+    setStartingPosition({
+      x_coord: Math.floor(x),
+      y_coord: Math.floor(y),
+    });
+  }
+
   const validateInput = () => {
     if (floodColor.red < 0 || floodColor.red > 255) return false;
     if (floodColor.green < 0 || floodColor.green > 255) return false;
@@ -111,7 +141,7 @@ const FloodFill = ({
             min={0}
             max={255}
             onChange={(e) => handleUpdateColor(e, 'red')}
-            defaultValue={floodColor.red}
+            value={floodColor.red}
           />
         </div>
         <div>
@@ -121,7 +151,7 @@ const FloodFill = ({
             min={0}
             max={255}
             onChange={(e) => handleUpdateColor(e, 'green')}
-            defaultValue={floodColor.green}
+            value={floodColor.green}
           />
         </div>
         <div>
@@ -131,7 +161,7 @@ const FloodFill = ({
             min={0}
             max={255}
             onChange={(e) => handleUpdateColor(e, 'blue')}
-            defaultValue={floodColor.blue}
+            value={floodColor.blue}
           />
         </div>
       </div>
@@ -141,13 +171,13 @@ const FloodFill = ({
         <input
           type="number"
           onChange={(e) => handleUpdatePosition(e, "x_coord")}
-          defaultValue={startingPosition.x_coord}
+          value={startingPosition.x_coord}
         />
         &nbsp;x&nbsp;
         <input
           type="number"
           onChange={(e) => handleUpdatePosition(e, "y_coord")}
-          defaultValue={startingPosition.y_coord}
+          value={startingPosition.y_coord}
         />
       </div>
       <br />
@@ -162,6 +192,7 @@ const FloodFill = ({
           id="flood-canvas"
           className={imageAdded ? "" : "hide"}
           ref={floodCanvasRef}
+          onClick={handleClickCanvas}
         ></canvas>
       </div>
     </div>

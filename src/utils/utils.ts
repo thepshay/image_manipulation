@@ -83,32 +83,63 @@ export const floodImage = ({
   const width = ctx.canvas.width;
   const height = ctx.canvas.height;
 
+  console.log(`width: ${width}`)
+
   const imageData = ctx.getImageData(startingPosition.x_coord, startingPosition.y_coord, width, height);
 
-  path.forEach((coord) => {
-    const { x_coord, y_coord } = coord;
-    // drawPixel({imageData, x_coord, y_coord, width, red: 255, green: 0, blue: 0})
-    const index = (x_coord + y_coord * width) * 4;
+  // const { red: newRed, green: newGreen, blue: newBlue } = floodColor;
 
-    imageData.data[index + 0] = 255;
-    imageData.data[index + 1] = 0;
-    imageData.data[index + 2] = 0;
-    imageData.data[index + 3] = 255;
+  path.forEach((coord) => {
+
+    // drawPixels2(ctx, coord, floodColor);
+
+
+
+    const { x_coord, y_coord } = coord;
+    drawPixel({imageData, x_coord, y_coord, width, red: 255, green: 0, blue: 0})
+    // TODO: FIX imageData manipulation
+    // const index = ((x_coord + (y_coord * width)) * 4);
+
+    // imageData.data[index + 0] = newRed;
+    // imageData.data[index + 1] = newGreen;
+    // imageData.data[index + 2] = newBlue;
+    // imageData.data[index + 3] = 255;
   });
 
+  // TODO:
   ctx.putImageData(imageData, 0, 0);
-
-  console.log('updated')
 }
+
+
 
 //TODO: add types
 const drawPixel = ({ imageData, x_coord, y_coord, canvasWidth, red, green, blue }: any) => {
-  const index = (x_coord + y_coord * canvasWidth) * 4;
+  const index = (x_coord + y_coord * 128) * 4;
+  // debugger
+  console.log(index);
 
   imageData.data[index + 0] = red;
   imageData.data[index + 1] = green;
   imageData.data[index + 2] = blue;
+  imageData.data[index + 3] = 255;
 }
+
+// const drawPixels2 = (
+//   ctx: CanvasRenderingContext2D,
+//   coord: {
+//     x_coord: number;
+//     y_coord: number;
+//   }, 
+//   floodColor: {
+//     red: number;
+//     green: number;
+//     blue: number;
+//   }) => {
+//   const { red, blue, green } = floodColor;
+//   const {x_coord, y_coord} = coord;
+//   ctx.fillStyle = `rgb(${red}, ${blue}, ${green})`;
+//   ctx.fillRect(x_coord, y_coord, 1, 1);
+// }
 
 const stackArrayFlood = ({
   ctx,
