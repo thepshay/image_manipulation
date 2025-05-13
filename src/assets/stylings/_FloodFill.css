@@ -1,0 +1,12 @@
+.input-group { 
+  display: flex;
+  flex-direction: row;
+}
+
+.color-group {
+  flex: 1;
+}
+
+.option-group {
+  flex: 2;
+}

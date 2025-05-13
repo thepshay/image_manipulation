@@ -8,7 +8,8 @@ interface FloodImageParams {
     x_coord: number;
     y_coord: number;
   };
-  floodCanvasRef: React.RefObject<null>
+  floodCanvasRef: React.RefObject<null>;
+  shouldAnimate: boolean;
 }
 
 interface StackArrayFloodParams {
@@ -50,10 +51,11 @@ interface ValidCoordParam {
   }
 }
 
-export const floodImage = ({
+export const floodImage = async ({
   floodColor,
   startingPosition,
-  floodCanvasRef
+  floodCanvasRef,
+  shouldAnimate=false,
 }: FloodImageParams) => {
 
   if (!floodCanvasRef.current) {
@@ -61,19 +63,41 @@ export const floodImage = ({
     return;
   }
 
+  console.log(startingPosition);
+
   const floodCanvas = floodCanvasRef.current as HTMLCanvasElement;
   const ctx = floodCanvas.getContext('2d') as CanvasRenderingContext2D;
   const startingPositionData = ctx.getImageData(startingPosition.x_coord, startingPosition.y_coord, 1, 1);
   const [red, green, blue] = startingPositionData.data
   const startingColor = { red, green, blue };
-  const path = stackArrayFlood({ ctx, startingColor, position: startingPosition })
+  const path = getStackArrayFloodPath({ ctx, startingColor, position: startingPosition })
 
+  if (shouldAnimate) {
+    await animatedFloodPixels(ctx, path, floodColor);
+  } else {
+    floodImageFromPath(ctx, path, floodColor);
+  }
+
+}
+
+const floodImageFromPath = (
+  ctx: CanvasRenderingContext2D,
+  path: {
+    x_coord: number;
+    y_coord: number;
+  }[],
+  floodColor: {
+    red: number;
+    green: number;
+    blue: number;
+  }
+) => {
   path.forEach((coord) => {
-    drawPixels(ctx, coord, floodColor)
+    colorIndividualPixel(ctx, coord, floodColor)
   });
 }
 
-const drawPixels = (
+const colorIndividualPixel = (
   ctx: CanvasRenderingContext2D,
   coord: {
     x_coord: number;
@@ -84,13 +108,64 @@ const drawPixels = (
     green: number;
     blue: number;
   }) => {
-  const { red, blue, green } = floodColor;
+  const { red, green, blue } = floodColor;
   const { x_coord, y_coord } = coord;
-  ctx.fillStyle = `rgb(${red}, ${blue}, ${green})`;
+  ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
   ctx.fillRect(x_coord, y_coord, 1, 1);
 }
 
-const stackArrayFlood = ({
+const animatedFloodPixels = async (
+  ctx: CanvasRenderingContext2D,
+  path: {
+    x_coord: number;
+    y_coord: number;
+  }[],
+  floodColor: {
+    red: number;
+    green: number;
+    blue: number;
+  },
+  speed: number = 1,
+) => {
+  return new Promise<void>(resolve => {
+    for (let i = 0; i < path.length; i += 1) {
+      setTimeout(() => {
+        colorIndividualPixel(ctx, path[i], floodColor);
+
+        if (i === path.length - 1) {
+          resolve();
+        }
+      }, (speed) * i);
+    }
+  })
+}
+
+// async function fillPathAsync(ctx, path, floodColor, speed) {
+//   return new Promise((resolve) => {
+//     for (let i = 0; i < path.length; i += 1) {
+//       if (i === path.length - 1) {
+//         // For the last pixel, resolve the promise after it's colored
+//         setTimeout(() => {
+//           colorIndividualPixel(ctx, path[i], floodColor);
+//           resolve(); // Signal that all pixels have been colored
+//         }, speed * i);
+//       } else {
+//         // For all other pixels, just color them
+//         setTimeout(() => {
+//           colorIndividualPixel(ctx, path[i], floodColor);
+//         }, speed * i);
+//       }
+//     }
+
+//     // If the path is empty, resolve immediately
+//     if (path.length === 0) {
+//       resolve();
+//     }
+//   });
+// }
+
+
+const getStackArrayFloodPath = ({
   ctx,
   startingColor,
   position
