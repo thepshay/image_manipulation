@@ -61,85 +61,34 @@ export const floodImage = ({
     return;
   }
 
-  // return a list of coordinates to flood
-
   const floodCanvas = floodCanvasRef.current as HTMLCanvasElement;
   const ctx = floodCanvas.getContext('2d') as CanvasRenderingContext2D;
-
-  //TODO: reduntant getImageData() -> 
-  //https://stackoverflow.com/questions/7812514/drawing-a-dot-on-html5-canvas
   const startingPositionData = ctx.getImageData(startingPosition.x_coord, startingPosition.y_coord, 1, 1);
   const [red, green, blue] = startingPositionData.data
   const startingColor = { red, green, blue };
   const path = stackArrayFlood({ ctx, startingColor, position: startingPosition })
 
-  // stack overflow :(
-  // const path: { x_coord: number, y_coord: number }[] = [];
-  // const visited: Set<string> = new Set();
-  // recursiveFlood({ ctx, startingColor, position: startingPosition, visited, path });
-
-  console.log(path)
-
-  const width = ctx.canvas.width;
-  const height = ctx.canvas.height;
-
-  console.log(`width: ${width}`)
-
-  const imageData = ctx.getImageData(startingPosition.x_coord, startingPosition.y_coord, width, height);
-
-  // const { red: newRed, green: newGreen, blue: newBlue } = floodColor;
-
   path.forEach((coord) => {
-
-    // drawPixels2(ctx, coord, floodColor);
-
-
-
-    const { x_coord, y_coord } = coord;
-    drawPixel({imageData, x_coord, y_coord, width, red: 255, green: 0, blue: 0})
-    // TODO: FIX imageData manipulation
-    // const index = ((x_coord + (y_coord * width)) * 4);
-
-    // imageData.data[index + 0] = newRed;
-    // imageData.data[index + 1] = newGreen;
-    // imageData.data[index + 2] = newBlue;
-    // imageData.data[index + 3] = 255;
+    drawPixels(ctx, coord, floodColor)
   });
-
-  // TODO:
-  ctx.putImageData(imageData, 0, 0);
 }
 
-
-
-//TODO: add types
-const drawPixel = ({ imageData, x_coord, y_coord, canvasWidth, red, green, blue }: any) => {
-  const index = (x_coord + y_coord * 128) * 4;
-  // debugger
-  console.log(index);
-
-  imageData.data[index + 0] = red;
-  imageData.data[index + 1] = green;
-  imageData.data[index + 2] = blue;
-  imageData.data[index + 3] = 255;
+const drawPixels = (
+  ctx: CanvasRenderingContext2D,
+  coord: {
+    x_coord: number;
+    y_coord: number;
+  },
+  floodColor: {
+    red: number;
+    green: number;
+    blue: number;
+  }) => {
+  const { red, blue, green } = floodColor;
+  const { x_coord, y_coord } = coord;
+  ctx.fillStyle = `rgb(${red}, ${blue}, ${green})`;
+  ctx.fillRect(x_coord, y_coord, 1, 1);
 }
-
-// const drawPixels2 = (
-//   ctx: CanvasRenderingContext2D,
-//   coord: {
-//     x_coord: number;
-//     y_coord: number;
-//   }, 
-//   floodColor: {
-//     red: number;
-//     green: number;
-//     blue: number;
-//   }) => {
-//   const { red, blue, green } = floodColor;
-//   const {x_coord, y_coord} = coord;
-//   ctx.fillStyle = `rgb(${red}, ${blue}, ${green})`;
-//   ctx.fillRect(x_coord, y_coord, 1, 1);
-// }
 
 const stackArrayFlood = ({
   ctx,
@@ -175,7 +124,6 @@ const stackArrayFlood = ({
   }
 
   return path;
-
 }
 
 const recursiveFlood = ({
@@ -225,17 +173,3 @@ const validCoord = ({
 
   return true;
 }
-
-// recursiveFlood
-// params: startingColor, coordSet, path = []
-
-// check if coords are valid
-//  - x and y are inside image
-//  - color at x,y is the same as starting color -->> 
-// check if coord has been visited
-// add coord to the set
-// push coord int opath
-// loop through direction 4 or 8? 
-// set new coords
-// recuriveFlood -> new coord
-// return path
