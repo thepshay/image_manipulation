@@ -10,6 +10,7 @@ interface FloodImageParams {
   };
   floodCanvasRef: React.RefObject<null>;
   shouldAnimate: boolean;
+  colorDistance: number;
 }
 
 interface StackArrayFloodParams {
@@ -23,6 +24,7 @@ interface StackArrayFloodParams {
     x_coord: number;
     y_coord: number;
   };
+  colorDistance: number;
 }
 
 interface RecursiveFloodParams {
@@ -38,6 +40,7 @@ interface RecursiveFloodParams {
   };
   visited: Set<string>;
   path: { x_coord: number, y_coord: number }[];
+  colorDistance: number;
 }
 
 interface ValidCoordParam {
@@ -48,14 +51,16 @@ interface ValidCoordParam {
     red: number;
     green: number;
     blue: number;
-  }
+  };
+  colorDistance: number;
 }
 
 export const floodImage = async ({
   floodColor,
   startingPosition,
   floodCanvasRef,
-  shouldAnimate=false,
+  shouldAnimate = false,
+  colorDistance,
 }: FloodImageParams) => {
 
   if (!floodCanvasRef.current) {
@@ -70,7 +75,12 @@ export const floodImage = async ({
   const startingPositionData = ctx.getImageData(startingPosition.x_coord, startingPosition.y_coord, 1, 1);
   const [red, green, blue] = startingPositionData.data
   const startingColor = { red, green, blue };
-  const path = getStackArrayFloodPath({ ctx, startingColor, position: startingPosition })
+  const path = getStackArrayFloodPath({
+    ctx,
+    startingColor,
+    position: startingPosition,
+    colorDistance,
+  })
 
   if (shouldAnimate) {
     await animatedFloodPixels(ctx, path, floodColor);
@@ -140,35 +150,11 @@ const animatedFloodPixels = async (
   })
 }
 
-// async function fillPathAsync(ctx, path, floodColor, speed) {
-//   return new Promise((resolve) => {
-//     for (let i = 0; i < path.length; i += 1) {
-//       if (i === path.length - 1) {
-//         // For the last pixel, resolve the promise after it's colored
-//         setTimeout(() => {
-//           colorIndividualPixel(ctx, path[i], floodColor);
-//           resolve(); // Signal that all pixels have been colored
-//         }, speed * i);
-//       } else {
-//         // For all other pixels, just color them
-//         setTimeout(() => {
-//           colorIndividualPixel(ctx, path[i], floodColor);
-//         }, speed * i);
-//       }
-//     }
-
-//     // If the path is empty, resolve immediately
-//     if (path.length === 0) {
-//       resolve();
-//     }
-//   });
-// }
-
-
 const getStackArrayFloodPath = ({
   ctx,
   startingColor,
-  position
+  position,
+  colorDistance
 }: StackArrayFloodParams) => {
   const path: { x_coord: number, y_coord: number }[] = [];
   const visited: Set<string> = new Set();
@@ -186,7 +172,8 @@ const getStackArrayFloodPath = ({
       const new_x = currentPosition.x_coord + dir[0];
       const new_y = currentPosition.y_coord + dir[1];
 
-      if (!visited.has(`${new_x}, ${new_y}`) && validCoord({ ctx, new_x, new_y, startingColor })) {
+      if (!visited.has(`${new_x}, ${new_y}`) &&
+        validCoord({ ctx, new_x, new_y, startingColor, colorDistance })) {
         const newPosition = {
           x_coord: new_x,
           y_coord: new_y,
@@ -206,7 +193,8 @@ const recursiveFlood = ({
   startingColor,
   position,
   visited,
-  path
+  path,
+  colorDistance,
 }: RecursiveFloodParams) => {
   visited.add(`${position.x_coord}, ${position.y_coord}`);
   path.push(position);
@@ -217,12 +205,12 @@ const recursiveFlood = ({
     const new_x = position.x_coord + dir[0];
     const new_y = position.y_coord + dir[1];
 
-    if (!visited.has(`${new_x}, ${new_y}`) && validCoord({ ctx, new_x, new_y, startingColor })) {
+    if (!visited.has(`${new_x}, ${new_y}`) && validCoord({ ctx, new_x, new_y, startingColor, colorDistance })) {
       const newPosition = {
         x_coord: new_x,
         y_coord: new_y,
       }
-      recursiveFlood({ ctx, startingColor, position: newPosition, visited, path })
+      recursiveFlood({ ctx, startingColor, position: newPosition, visited, path, colorDistance })
     }
   })
 
@@ -234,6 +222,7 @@ const validCoord = ({
   new_x,
   new_y,
   startingColor,
+  colorDistance
 }: ValidCoordParam) => {
   const width = ctx.canvas.width;
   const height = ctx.canvas.height;
@@ -244,7 +233,37 @@ const validCoord = ({
   const imageData = ctx.getImageData(new_x, new_y, 1, 1);
   const [red, green, blue] = imageData.data;
 
-  if (startingColor.red !== red || startingColor.green !== green || startingColor.blue !== blue) return false;
+  if (!colorDistance) {
+    if (startingColor.red !== red || startingColor.green !== green || startingColor.blue !== blue) return false;
+  } else {
+    return calculateEuclieanDistance(startingColor, {red, green, blue }, colorDistance);
+  }
 
   return true;
+}
+
+const calculateEuclieanDistance = (
+  startingColor: {
+    red: number;
+    green: number;
+    blue: number;
+  },
+  nextColor: {
+    red: number;
+    green: number;
+    blue: number;
+  },
+  colorDistance: number,
+) => {
+  const {red: red1, green: green1, blue: blue1} = startingColor;
+  const {red: red2, green: green2, blue: blue2} = nextColor;
+
+  const dRed = red1 - red2;
+  const dGreen = green1 - green2; 
+  const dBlue = blue1 - blue2;
+
+  const squaredDistance = dRed * dRed + dGreen * dGreen + dBlue * dBlue;
+  const distance = Math.sqrt(squaredDistance);
+
+  return distance <= colorDistance;
 }

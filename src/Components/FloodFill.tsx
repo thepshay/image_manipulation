@@ -26,6 +26,7 @@ const FloodFill = ({
   const [isClickToFill, setIsClickToFill] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [colorDistance, setColorDistance] = useState<number>(0);
 
   const floodCanvasRef = useRef(null);
 
@@ -100,7 +101,13 @@ const FloodFill = ({
 
     console.log(startingPosition)
 
-    await floodImage({ floodColor, startingPosition, floodCanvasRef, shouldAnimate });
+    await floodImage({ 
+      floodColor, 
+      startingPosition, 
+      floodCanvasRef, 
+      shouldAnimate,
+      colorDistance,
+    });
     setIsLoading(false);
   }
 
@@ -121,10 +128,22 @@ const FloodFill = ({
     if (isClickToFill) {
       setIsLoading(true);
 
-      await floodImage({ floodColor, startingPosition: newCoord, floodCanvasRef, shouldAnimate });
+      await floodImage({ 
+        floodColor, 
+        startingPosition: newCoord, 
+        floodCanvasRef, 
+        shouldAnimate,
+        colorDistance
+      });
       setIsLoading(false);
-
     }
+  }
+
+  const handleUpdateColorDistance = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+
+    console.log(value)
+    setColorDistance(value);
   }
 
   const validateInput = () => {
@@ -132,8 +151,12 @@ const FloodFill = ({
     if (floodColor.green < 0 || floodColor.green > 255) return false;
     if (floodColor.blue < 0 || floodColor.blue > 255) return false;
 
-    if (startingPosition.x_coord < 0 || startingPosition.x_coord > width) return false;
-    if (startingPosition.y_coord < 0 || startingPosition.y_coord > height) return false;
+    if (startingPosition.x_coord < 0 || 
+      startingPosition.x_coord > width
+    ) return false;
+    if (startingPosition.y_coord < 0 || 
+      startingPosition.y_coord > height
+    ) return false;
 
     return true;
   }
@@ -142,7 +165,6 @@ const FloodFill = ({
     <div>
       <br />
       <div className="input-group">
-
         <div className="color-group">
           <div>
             <div>R</div>
@@ -197,6 +219,17 @@ const FloodFill = ({
             />
             <label htmlFor="should-animate">Animate</label>
           </div>
+          <br></br>
+          <div>
+            <div>
+              Color Distance
+            </div>
+            <input
+              type="number"
+              value={colorDistance}
+              onChange={handleUpdateColorDistance}
+            />
+          </div>
         </div>
       </div>
       <br />
@@ -227,7 +260,7 @@ const FloodFill = ({
           id="flood-canvas"
           className={imageAdded ? "" : "hide"}
           ref={floodCanvasRef}
-          onClick={handleClickCanvas}
+          onClick={!isLoading ? handleClickCanvas : ()=>{}}
         ></canvas>
       </div>
     </div>
