@@ -11,11 +11,8 @@ interface ColorDistributionProps {
 const ColorDistribution = ({
   canvasRef,
   imageAdded,
-  pixelsData,
   setPixelsData,
 }: ColorDistributionProps) => {
-
-  if (!imageAdded) return null;
 
   const [colorDistribution, setColorDistribution] = useState<{ [key: string]: number }>({})
   const [totalPixels, setTotalPixels] = useState<number>(0);
@@ -29,8 +26,6 @@ const ColorDistribution = ({
     console.log('distribution useEffect')
 
     const canvas = canvasRef.current as HTMLCanvasElement;
-    // setWidth(canvas.width);
-    // setHeight(canvas.height);
     setTotalPixels(canvas.width * canvas.height)
 
     calculateDistribution(canvas)
@@ -93,6 +88,8 @@ const ColorDistribution = ({
     const pixelRatio = pixelCount / totalPixels;
     return Math.round(pixelRatio * 10000) / 100;
   }
+
+  if (!imageAdded) return null;
 
   return (
     <div>

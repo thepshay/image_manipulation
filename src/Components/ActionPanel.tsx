@@ -14,7 +14,7 @@ const ActionPanel = ({
   imageAdded,
   canvasRef,
 }: ActionPanelProps) => {
-  const [currentTab, setCurrentTab] = useState<string>('floodfill');
+  const [currentTab, setCurrentTab] = useState<string>('quantization');
 
   //TODO set type
   const [pixelsData, setPixelsData] = useState<number[][]>([])
@@ -70,6 +70,7 @@ const ActionPanel = ({
           <Quantization 
             canvasRef={canvasRef}
             imageAdded={imageAdded}
+            pixelsData={pixelsData}
           />
         </div>
         <div className={`${currentTab === 'quantizedfloodfill' ? '' : 'hide'}`}>

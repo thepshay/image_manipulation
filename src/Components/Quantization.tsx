@@ -21,11 +21,13 @@ import { copyCanvas } from '../utils/utils.ts'
 interface QuantizationProps {
   canvasRef: React.RefObject<null>;
   imageAdded: boolean;
+  pixelsData: number[][]
 }
 
 const Quantization = ({
   canvasRef,
   imageAdded,
+  pixelsData,
 }: QuantizationProps) => {
 
   const quantizationCanvasRef = useRef(null);
@@ -36,6 +38,12 @@ const Quantization = ({
     const newPower = Number(e.target.value);
     setPower(newPower);
   }
+
+  useEffect(() => {
+    if (pixelsData.length) {
+      console.log(pixelsData)
+    } 
+  }, [pixelsData.length]);
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -69,14 +77,14 @@ const Quantization = ({
           onChange={handleUpdatePower}
         />
         <datalist id='power'>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7">7</option>
-          <option value="8">8</option>
+          <option value="1" />
+          <option value="2" />
+          <option value="3" />
+          <option value="4" />
+          <option value="5" />
+          <option value="6" />
+          <option value="7" />
+          <option value="8" />
         </datalist>
         <br />
         <span>{power}</span>
