@@ -16,6 +16,9 @@ const ActionPanel = ({
 }: ActionPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('floodfill');
 
+  //TODO set type
+  const [pixelsData, setPixelsData] = useState<number[][]>([])
+
   const handleTabClick = (tabPage: string) => {
     setCurrentTab(tabPage)
   }
@@ -53,6 +56,8 @@ const ActionPanel = ({
           <ColorDistribution
             canvasRef={canvasRef}
             imageAdded={imageAdded}
+            pixelsData={pixelsData}
+            setPixelsData={setPixelsData}
           />
         </div>
         <div className={`${currentTab === 'floodfill' ? '' : 'hide'}`}>
@@ -62,7 +67,10 @@ const ActionPanel = ({
           />
         </div>
         <div className={`${currentTab === 'quantization' ? '' : 'hide'}`}>
-          <Quantization />
+          <Quantization 
+            canvasRef={canvasRef}
+            imageAdded={imageAdded}
+          />
         </div>
         <div className={`${currentTab === 'quantizedfloodfill' ? '' : 'hide'}`}>
           <QuantizedFloodFill />

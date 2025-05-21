@@ -4,18 +4,20 @@ import { useEffect, useState } from "react";
 interface ColorDistributionProps {
   canvasRef: React.RefObject<null>,
   imageAdded: boolean;
+  pixelsData: number[][];
+  setPixelsData: (a: number[][]) => void;
 }
 
 const ColorDistribution = ({
   canvasRef,
   imageAdded,
+  pixelsData,
+  setPixelsData,
 }: ColorDistributionProps) => {
 
   if (!imageAdded) return null;
 
   const [colorDistribution, setColorDistribution] = useState<{ [key: string]: number }>({})
-  // const [width, setWidth] = useState<number>(0);
-  // const [height, setHeight] = useState<number>(0);
   const [totalPixels, setTotalPixels] = useState<number>(0);
 
   useEffect(() => {
@@ -43,6 +45,7 @@ const ColorDistribution = ({
     const colorData = imageData.data as Uint8ClampedArray<ArrayBufferLike>;
 
     const colorCounter: { [key: string]: number } = {};
+    const colorList = [];
 
     for (let i = 0; i < colorData.length; i += 4) {
       const r = colorData[i];
@@ -50,12 +53,16 @@ const ColorDistribution = ({
       const b = colorData[i + 2];
       const a = colorData[i + 3];
 
-      const rgba = `rgba(${r}, ${g}, ${b}, ${a})`
+      const rgba = `rgba(${r}, ${g}, ${b}, ${a})`;
+
+      const color = [r, g, b, a];
+      colorList.push(color);
 
       if (!colorCounter[rgba]) colorCounter[rgba] = 0;
       colorCounter[rgba] += 1;
     };
 
+    setPixelsData(colorList);
     setColorDistribution(colorCounter);
 
     console.log(Object.keys(colorCounter).length);
@@ -72,7 +79,7 @@ const ColorDistribution = ({
       entries.sort((a, b) => a[1] - b[1]);
     }
 
-    {/* TODO: batch pagination */}
+    {/* TODO: batch pagination */ }
     const sortedKeys = entries.slice(0, 1000).map(entry => entry[0]);
 
     console.log('finish key sort')

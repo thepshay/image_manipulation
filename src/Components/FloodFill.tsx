@@ -1,7 +1,8 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { floodImage } from '../utils/utils.js';
+import { floodImage } from '../utils/floodFillUtils.js';
 import '../assets/stylings/_FloodFill.css';
+import { copyCanvas } from "../utils/utils.js";
 
 interface FloodFillProps {
   canvasRef: React.RefObject<null>;
@@ -41,29 +42,12 @@ const FloodFill = ({
     }
 
     const canvas = canvasRef.current as HTMLCanvasElement;
-    copyCanvas(canvas);
+    copyCanvas(canvas, floodCanvasRef,
+      ({ width, height }: { width: number, height: number }) => {
+        setWidth(width);
+        setHeight(height);
+      });
   }, [imageAdded]);
-
-  const copyCanvas = (canvas: HTMLCanvasElement) => {
-    if (!floodCanvasRef.current) {
-      console.log('copyCanvas(): no flood canvas');
-      return;
-    }
-
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
-
-    setWidth(canvasWidth);
-    setHeight(canvasHeight);
-
-    const floodCanvas = floodCanvasRef.current as HTMLCanvasElement;
-    const ctx = floodCanvas.getContext('2d');
-
-    floodCanvas.width = canvasWidth;
-    floodCanvas.height = canvasHeight;
-
-    ctx?.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
-  }
 
   const handleUpdateColor = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -101,10 +85,10 @@ const FloodFill = ({
 
     console.log(startingPosition)
 
-    await floodImage({ 
-      floodColor, 
-      startingPosition, 
-      floodCanvasRef, 
+    await floodImage({
+      floodColor,
+      startingPosition,
+      floodCanvasRef,
       shouldAnimate,
       colorDistance,
     });
@@ -128,10 +112,10 @@ const FloodFill = ({
     if (isClickToFill) {
       setIsLoading(true);
 
-      await floodImage({ 
-        floodColor, 
-        startingPosition: newCoord, 
-        floodCanvasRef, 
+      await floodImage({
+        floodColor,
+        startingPosition: newCoord,
+        floodCanvasRef,
         shouldAnimate,
         colorDistance
       });
@@ -151,10 +135,10 @@ const FloodFill = ({
     if (floodColor.green < 0 || floodColor.green > 255) return false;
     if (floodColor.blue < 0 || floodColor.blue > 255) return false;
 
-    if (startingPosition.x_coord < 0 || 
+    if (startingPosition.x_coord < 0 ||
       startingPosition.x_coord > width
     ) return false;
-    if (startingPosition.y_coord < 0 || 
+    if (startingPosition.y_coord < 0 ||
       startingPosition.y_coord > height
     ) return false;
 
@@ -260,7 +244,7 @@ const FloodFill = ({
           id="flood-canvas"
           className={imageAdded ? "" : "hide"}
           ref={floodCanvasRef}
-          onClick={!isLoading ? handleClickCanvas : ()=>{}}
+          onClick={!isLoading ? handleClickCanvas : () => { }}
         ></canvas>
       </div>
     </div>
