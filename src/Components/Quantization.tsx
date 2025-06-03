@@ -7,6 +7,7 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { copyCanvas } from '../utils/utils.ts'
+import { medianCut } from "../utils/quantizationUtils.ts";
 
 // Dithering -> reduce color pallete
 //   - Ordered Dithering -> https://en.wikipedia.org/wiki/Ordered_dithering
@@ -39,11 +40,9 @@ const Quantization = ({
     setPower(newPower);
   }
 
-  useEffect(() => {
-    if (pixelsData.length) {
-      console.log(pixelsData)
-    } 
-  }, [pixelsData.length]);
+  const handleClick = () => {
+    medianCut(pixelsData, power);
+  }
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -65,7 +64,7 @@ const Quantization = ({
       Quantization
       <br />
       <br />
-      <button>Quantize!</button>
+      <button onClick={handleClick}>Median Cut</button>
       <br />
       <br />
       <div>
