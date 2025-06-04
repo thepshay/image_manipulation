@@ -70,12 +70,13 @@ const Quantization = ({
       <div>
         <input type="range"
           value={power}
-          min="1"
+          min="0"
           max="8"
           list="power"
           onChange={handleUpdatePower}
         />
         <datalist id='power'>
+          <option value="0" />
           <option value="1" />
           <option value="2" />
           <option value="3" />
@@ -99,3 +100,8 @@ const Quantization = ({
 }
 
 export default Quantization;
+
+
+// TODO: Display all colors from median cut
+// TODO: Map quantize colors to image
+// TODO: Animate 0 power to 8th power remapping

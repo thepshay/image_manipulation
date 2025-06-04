@@ -4,14 +4,20 @@ const BLUE = 2;
 
 export const medianCut = (pixelBucket: number[][], power: number) => {
   const cutBuckets = calculateMedianCut(pixelBucket, power);
+  const partitionedColors: number[][] = [];
 
-  // TODO: sort this bish
-  console.log(cutBuckets);
+  cutBuckets.forEach(bucket => {
+    partitionedColors.push(getAverageColor(bucket));
+  });
+
+  console.log(partitionedColors);
+
+  return partitionedColors;
 }
 
-export const calculateMedianCut = (pixelBucket: number[][], power: number) : number[][][]  => {
+export const calculateMedianCut = (pixelBucket: number[][], power: number): number[][][] => {
   // TOOD: edge case if pixelBucket is empty/1(?)
-  if (power === 1) return [pixelBucket];
+  if (power === 0) return [pixelBucket];
 
   const colorIdx = getGreatestRangeColor(pixelBucket);
   const sortedBucket = pixelBucket.sort((a, b) => a[colorIdx] - b[colorIdx]);
@@ -57,4 +63,23 @@ const getRange = (pixelBuck: number[][], idx: number) => {
   });
 
   return max - min;
+}
+
+const getAverageColor = (pixels: number[][]) => {
+  let redSum = 0;
+  let greenSum = 0;
+  let blueSum = 0;
+  const length = pixels.length;
+
+  pixels.forEach((pixel) => {
+    redSum += pixel[0];
+    greenSum += pixel[1];
+    blueSum += pixel[2];
+  });
+
+  const redAvg = Math.ceil(redSum / length);
+  const greenAvg = Math.ceil(greenSum / length);
+  const blueAvg = Math.ceil(blueSum / length);
+
+  return [redAvg, greenAvg, blueAvg];
 }
