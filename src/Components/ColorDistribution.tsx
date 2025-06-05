@@ -58,6 +58,7 @@ const ColorDistribution = ({
     };
 
     setPixelsData(colorList);
+    console.log(colorCounter)
     setColorDistribution(colorCounter);
 
     console.log(Object.keys(colorCounter).length);

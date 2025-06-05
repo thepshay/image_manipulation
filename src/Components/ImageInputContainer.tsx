@@ -52,6 +52,19 @@ const ImageInputContainer = ({
     }
   }
 
+  const handleResetImage = () => {
+    setImageAdded(false);
+
+    if (!canvasRef.current) {
+      console.log('Reset canvas: no canvas found')
+      return;
+    }
+
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
   return (
     <div className='image-input-container'>
       <input
@@ -60,12 +73,14 @@ const ImageInputContainer = ({
         accept='image/png, image/jpeg'
         onChange={handleFileInput}
       />
+      <button onClick={handleResetImage}>Reset Image</button>
+      <br></br>
       <canvas
         id='image-canvas'
         className={imageAdded ? "" : "hide"}
         ref={canvasRef}
       ></canvas>
-      {canvasRef.current &&
+      {(canvasRef.current && imageAdded) &&
         <div>
           {(canvasRef.current as HTMLCanvasElement).width} x {(canvasRef.current as HTMLCanvasElement).height}
         </div>}
