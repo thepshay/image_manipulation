@@ -10,8 +10,6 @@ export const medianCut = (pixelBucket: number[][], power: number) => {
     partitionedColors.push(getAverageColor(bucket));
   });
 
-  console.log(partitionedColors);
-
   return partitionedColors;
 }
 

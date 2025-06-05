@@ -33,7 +33,7 @@ const Quantization = ({
 
   const quantizationCanvasRef = useRef(null);
   const [power, setPower] = useState(1);
-
+  const [quantizedColors, setQuantizedColors] = useState<number[][]>([]);
 
   const handleUpdatePower = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPower = Number(e.target.value);
@@ -41,8 +41,13 @@ const Quantization = ({
   }
 
   const handleClick = () => {
-    medianCut(pixelsData, power);
+    const nonTransparentPixels = pixelsData.filter((color) => color[3] !== 0);
+
+    const colors = medianCut(nonTransparentPixels, power);
+    setQuantizedColors(colors);
   }
+
+
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -95,6 +100,13 @@ const Quantization = ({
         className={imageAdded ? "" : "hide"}
         ref={quantizationCanvasRef}
       ></canvas>
+      {quantizedColors.length && <div>
+        <br></br>
+        {quantizedColors.map((color, idx) => (
+          <div key={idx} style={{height: '50px', width: '50px', backgroundColor: `rgba(${color[0]}, ${color[1]}, ${color[2]})`}}>
+          </div>
+        ))}
+      </div>}
     </div>
   )
 }
