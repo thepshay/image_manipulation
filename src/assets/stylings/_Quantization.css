@@ -1,0 +1,11 @@
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  width: 210px;
+}
+
+.color-box {
+  height: 50px;
+  width: 50;
+  border: 1px solid black;
+}

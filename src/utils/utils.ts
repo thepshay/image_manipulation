@@ -23,3 +23,28 @@ export const copyCanvas = (
 
   ctx?.drawImage(canvas, 0, 0, canvasWidth, canvasHeight);
 }
+
+export const calculateEuclieanDistance = (
+  startingColor: {
+    red: number;
+    green: number;
+    blue: number;
+  },
+  nextColor: {
+    red: number;
+    green: number;
+    blue: number;
+  }
+) => {
+  const {red: red1, green: green1, blue: blue1} = startingColor;
+  const {red: red2, green: green2, blue: blue2} = nextColor;
+
+  const dRed = red1 - red2;
+  const dGreen = green1 - green2; 
+  const dBlue = blue1 - blue2;
+
+  const squaredDistance = dRed * dRed + dGreen * dGreen + dBlue * dBlue;
+  const distance = Math.sqrt(squaredDistance);
+
+  return distance;
+}

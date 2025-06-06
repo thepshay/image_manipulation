@@ -1,3 +1,5 @@
+import { calculateEuclieanDistance } from "./utils";
+
 const RED = 0;
 const GREEN = 1;
 const BLUE = 2;
@@ -80,4 +82,43 @@ const getAverageColor = (pixels: number[][]) => {
   const blueAvg = Math.ceil(blueSum / length);
 
   return [redAvg, greenAvg, blueAvg];
+}
+
+export const remapCanvas = (canvas: HTMLCanvasElement, quantizedColors: number[][]) => {
+  console.log('start remapping')
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const colorData = imageData.data;
+  // const distanceMapping = {};
+
+  for (let i = 0; i < colorData.length; i += 4) {
+    const r = colorData[i];
+    const g = colorData[i + 1];
+    const b = colorData[i + 2];
+    const a = colorData[i + 3];
+    const color = {red: r, green: g, blue: b};
+    let minDistance = 450;
+    let newColor = {red: 0, green: 0, blue: 0};
+    // const colorStr = `${r}, ${g}, ${b}`;
+
+    for (let j = 0; j < quantizedColors.length; j++) {
+      const quantizedColor = quantizedColors[j];
+      const nextColor = {red: quantizedColor[0], green: quantizedColor[1], blue: quantizedColor[2]}
+      const currDistance = calculateEuclieanDistance(color, nextColor);
+
+      if (currDistance < minDistance) {
+        minDistance = currDistance;
+        newColor = nextColor;
+      }
+    }
+
+    colorData[i] = newColor.red;
+    colorData[i+1] = newColor.green;
+    colorData[i+2] = newColor.blue;
+
+    // colorDistanceMapping
+
+  }
+  ctx.putImageData(imageData, 0, 0);
+  console.log('finish remapping')
 }

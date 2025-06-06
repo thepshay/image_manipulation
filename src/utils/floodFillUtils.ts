@@ -1,3 +1,5 @@
+import { calculateEuclieanDistance } from "./utils";
+
 interface FloodImageParams {
   floodColor: {
     red: number;
@@ -236,34 +238,9 @@ const validCoord = ({
   if (!colorDistance) {
     if (startingColor.red !== red || startingColor.green !== green || startingColor.blue !== blue) return false;
   } else {
-    return calculateEuclieanDistance(startingColor, {red, green, blue }, colorDistance);
+    const distance = calculateEuclieanDistance(startingColor, {red, green, blue });
+    return distance <= colorDistance;
   }
 
   return true;
-}
-
-const calculateEuclieanDistance = (
-  startingColor: {
-    red: number;
-    green: number;
-    blue: number;
-  },
-  nextColor: {
-    red: number;
-    green: number;
-    blue: number;
-  },
-  colorDistance: number,
-) => {
-  const {red: red1, green: green1, blue: blue1} = startingColor;
-  const {red: red2, green: green2, blue: blue2} = nextColor;
-
-  const dRed = red1 - red2;
-  const dGreen = green1 - green2; 
-  const dBlue = blue1 - blue2;
-
-  const squaredDistance = dRed * dRed + dGreen * dGreen + dBlue * dBlue;
-  const distance = Math.sqrt(squaredDistance);
-
-  return distance <= colorDistance;
 }

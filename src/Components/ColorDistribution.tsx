@@ -36,8 +36,8 @@ const ColorDistribution = ({
 
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 
-    const imageData = ctx.getImageData(0, 0, canvas.height, canvas.width) as ImageData;
-    const colorData = imageData.data as Uint8ClampedArray<ArrayBufferLike>;
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height) as ImageData;
+    const colorData = imageData.data;
 
     const colorCounter: { [key: string]: number } = {};
     const colorList = [];

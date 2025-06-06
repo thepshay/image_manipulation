@@ -7,7 +7,8 @@
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { copyCanvas } from '../utils/utils.ts'
-import { medianCut } from "../utils/quantizationUtils.ts";
+import { medianCut, remapCanvas } from "../utils/quantizationUtils.ts";
+import "../assets/stylings/_Quantization.css"
 
 // Dithering -> reduce color pallete
 //   - Ordered Dithering -> https://en.wikipedia.org/wiki/Ordered_dithering
@@ -40,14 +41,21 @@ const Quantization = ({
     setPower(newPower);
   }
 
-  const handleClick = () => {
+  const handleMedianCut = () => {
     const nonTransparentPixels = pixelsData.filter((color) => color[3] !== 0);
-
+ 
     const colors = medianCut(nonTransparentPixels, power);
     setQuantizedColors(colors);
   }
 
-
+  const handleMapColors = () => {
+    if (!quantizationCanvasRef.current) {
+      console.log('Remap: no canvas found');
+      return;
+    }
+    const canvas = quantizationCanvasRef.current as HTMLCanvasElement;
+    remapCanvas(canvas, quantizedColors);
+  }
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -69,7 +77,13 @@ const Quantization = ({
       Quantization
       <br />
       <br />
-      <button onClick={handleClick}>Median Cut</button>
+      <button onClick={handleMedianCut}>Median Cut</button>
+      <button
+        disabled={!!!quantizedColors.length}
+        onClick={handleMapColors}
+      >
+        Remap Image
+      </button>
       <br />
       <br />
       <div>
@@ -100,10 +114,15 @@ const Quantization = ({
         className={imageAdded ? "" : "hide"}
         ref={quantizationCanvasRef}
       ></canvas>
-      {quantizedColors.length && <div>
-        <br></br>
+      <br></br>
+      {quantizedColors.length && <div className="color-grid">
         {quantizedColors.map((color, idx) => (
-          <div key={idx} style={{height: '50px', width: '50px', backgroundColor: `rgba(${color[0]}, ${color[1]}, ${color[2]})`}}>
+          <div
+            className="color-box"
+            key={idx}
+            style={{
+              backgroundColor: `rgba(${color[0]}, ${color[1]}, ${color[2]})`
+            }}>
           </div>
         ))}
       </div>}
@@ -113,7 +132,5 @@ const Quantization = ({
 
 export default Quantization;
 
-
-// TODO: Display all colors from median cut
 // TODO: Map quantize colors to image
 // TODO: Animate 0 power to 8th power remapping
