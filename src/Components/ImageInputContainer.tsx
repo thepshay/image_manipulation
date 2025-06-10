@@ -2,15 +2,17 @@ import React from 'react';
 import '../assets/stylings/ImageInputContainer.css'
 
 interface ImageInputContainerProps {
-  imageAdded: boolean,
-  setImageAdded: (a: boolean) => void,
-  canvasRef: React.RefObject<null>,
+  imageAdded: boolean;
+  setImageAdded: (a: boolean) => void;
+  canvasRef: React.RefObject<null>;
+  setResetKey: (a: number | { (arg1: number): number }) => void;
 }
 
 const ImageInputContainer = ({
   imageAdded,
   setImageAdded,
   canvasRef,
+  setResetKey,
 }: ImageInputContainerProps) => {
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -53,6 +55,7 @@ const ImageInputContainer = ({
   }
 
   const handleResetImage = () => {
+    setResetKey((prev: number) => prev + 1);
     setImageAdded(false);
 
     if (!canvasRef.current) {

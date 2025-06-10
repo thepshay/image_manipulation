@@ -84,18 +84,23 @@ const getAverageColor = (pixels: number[][]) => {
   return [redAvg, greenAvg, blueAvg];
 }
 
-export const remapCanvas = (canvas: HTMLCanvasElement, quantizedColors: number[][]) => {
+export const remapCanvas = (originalCanvas: HTMLCanvasElement, mapCanvas: HTMLCanvasElement, quantizedColors: number[][]) => {
   console.log('start remapping')
-  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const coriginalCtx = originalCanvas.getContext('2d') as CanvasRenderingContext2D;
+  const imageData = coriginalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
   const colorData = imageData.data;
+
+  const mapCtx = mapCanvas.getContext('2d') as CanvasRenderingContext2D;
+  const mapImageData = mapCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
+  const mapColorData = mapImageData.data;
   // const distanceMapping = {};
 
   for (let i = 0; i < colorData.length; i += 4) {
     const r = colorData[i];
     const g = colorData[i + 1];
     const b = colorData[i + 2];
-    const a = colorData[i + 3];
+    // const a = colorData[i + 3];
+
     const color = {red: r, green: g, blue: b};
     let minDistance = 450;
     let newColor = {red: 0, green: 0, blue: 0};
@@ -112,13 +117,14 @@ export const remapCanvas = (canvas: HTMLCanvasElement, quantizedColors: number[]
       }
     }
 
-    colorData[i] = newColor.red;
-    colorData[i+1] = newColor.green;
-    colorData[i+2] = newColor.blue;
+    mapColorData[i] = newColor.red;
+    mapColorData[i+1] = newColor.green;
+    mapColorData[i+2] = newColor.blue;
 
     // colorDistanceMapping
 
   }
-  ctx.putImageData(imageData, 0, 0);
+
+  mapCtx.putImageData(mapImageData, 0, 0);
   console.log('finish remapping')
 }

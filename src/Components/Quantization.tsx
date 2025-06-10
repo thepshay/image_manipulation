@@ -35,26 +35,46 @@ const Quantization = ({
   const quantizationCanvasRef = useRef(null);
   const [power, setPower] = useState(1);
   const [quantizedColors, setQuantizedColors] = useState<number[][]>([]);
+  const nonTransparentPixels = pixelsData.filter((color) => color[3] !== 0);
+
 
   const handleUpdatePower = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPower = Number(e.target.value);
     setPower(newPower);
+
+    // if (!canvasRef.current) {
+    //   return;
+    // }
+
+    // if (!quantizationCanvasRef.current) {
+    //   console.log('Remap: no canvas found');
+    //   return;
+    // }
+
+    // const colors = medianCut(nonTransparentPixels, newPower);
+    // const originalCanvas = canvasRef.current as HTMLCanvasElement;
+    // const mapCanvas = quantizationCanvasRef.current as HTMLCanvasElement;
+    // remapCanvas(originalCanvas, mapCanvas, colors);
   }
 
   const handleMedianCut = () => {
-    const nonTransparentPixels = pixelsData.filter((color) => color[3] !== 0);
- 
     const colors = medianCut(nonTransparentPixels, power);
     setQuantizedColors(colors);
   }
 
-  const handleMapColors = () => {
+  const handleRemapColors = () => {
+    if (!canvasRef.current) {
+      return;
+    }
+
     if (!quantizationCanvasRef.current) {
       console.log('Remap: no canvas found');
       return;
     }
-    const canvas = quantizationCanvasRef.current as HTMLCanvasElement;
-    remapCanvas(canvas, quantizedColors);
+
+    const originalCanvas = canvasRef.current as HTMLCanvasElement;
+    const mapCanvas = quantizationCanvasRef.current as HTMLCanvasElement;
+    remapCanvas(originalCanvas, mapCanvas, quantizedColors);
   }
 
   useEffect(() => {
@@ -80,7 +100,7 @@ const Quantization = ({
       <button onClick={handleMedianCut}>Median Cut</button>
       <button
         disabled={!!!quantizedColors.length}
-        onClick={handleMapColors}
+        onClick={handleRemapColors}
       >
         Remap Image
       </button>
@@ -115,7 +135,7 @@ const Quantization = ({
         ref={quantizationCanvasRef}
       ></canvas>
       <br></br>
-      {quantizedColors.length && <div className="color-grid">
+      {quantizedColors.length ? <div className="color-grid">
         {quantizedColors.map((color, idx) => (
           <div
             className="color-box"
@@ -125,7 +145,7 @@ const Quantization = ({
             }}>
           </div>
         ))}
-      </div>}
+      </div> : null}
     </div>
   )
 }
