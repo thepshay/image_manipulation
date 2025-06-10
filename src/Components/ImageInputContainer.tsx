@@ -51,6 +51,7 @@ const ImageInputContainer = ({
       (ctx as CanvasRenderingContext2D).drawImage(image, 0, 0, width, height);
 
       setImageAdded(true);
+      setResetKey(prevKey => prevKey + 1);
     }
   }
 
