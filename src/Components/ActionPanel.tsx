@@ -3,7 +3,7 @@ import '../assets/stylings/ActionPanel.css'
 import ColorDistribution from './ColorDistribution';
 import FloodFill from './FloodFill';
 import Quantization from './Quantization';
-import QuantizedFloodFill from './QuantizedFloodFill';
+import Pixelate from './Pixelate';
 
 interface ActionPanelProps {
   imageAdded: boolean,
@@ -14,7 +14,7 @@ const ActionPanel = ({
   imageAdded,
   canvasRef,
 }: ActionPanelProps) => {
-  const [currentTab, setCurrentTab] = useState<string>('quantization');
+  const [currentTab, setCurrentTab] = useState<string>('pixelate');
 
   //TODO set type
   const [pixelsData, setPixelsData] = useState<number[][]>([])
@@ -45,10 +45,10 @@ const ActionPanel = ({
           Quantization
         </button>
         <button
-          onClick={() => handleTabClick('quantizedfloodfill')}
+          onClick={() => handleTabClick('pixelate')}
           disabled={!imageAdded}
         >
-          Quantized Flood Fill
+          Pixelate
         </button>
       </div>
       <div>
@@ -67,14 +67,18 @@ const ActionPanel = ({
           />
         </div>
         <div className={`${currentTab === 'quantization' ? '' : 'hide'}`}>
-          <Quantization 
+          <Quantization
             canvasRef={canvasRef}
             imageAdded={imageAdded}
             pixelsData={pixelsData}
           />
         </div>
-        <div className={`${currentTab === 'quantizedfloodfill' ? '' : 'hide'}`}>
-          <QuantizedFloodFill />
+        <div className={`${currentTab === 'pixelate' ? '' : 'hide'}`}>
+          <Pixelate
+            canvasRef={canvasRef}
+            imageAdded={imageAdded}
+            pixelsData={pixelsData}
+          />
         </div>
       </div>
     </div>
