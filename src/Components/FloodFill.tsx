@@ -20,7 +20,7 @@ const FloodFill = ({
   const DEFAULT_X = 0;
   const DEFAULT_Y = 0;
 
-  const [floodColor, setFloodColor] = useState({ red: DEFAULT_RED, green: DEFAULT_GREEN, blue: DEFAULT_BLUE });
+  const [floodColor, setFloodColor] = useState({ r: DEFAULT_RED, g: DEFAULT_GREEN, b: DEFAULT_BLUE });
   const [startingPosition, setStartingPosition] = useState({ x_coord: DEFAULT_X, y_coord: DEFAULT_Y });
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
@@ -131,9 +131,9 @@ const FloodFill = ({
   }
 
   const validateInput = () => {
-    if (floodColor.red < 0 || floodColor.red > 255) return false;
-    if (floodColor.green < 0 || floodColor.green > 255) return false;
-    if (floodColor.blue < 0 || floodColor.blue > 255) return false;
+    if (floodColor.r < 0 || floodColor.r > 255) return false;
+    if (floodColor.g < 0 || floodColor.g > 255) return false;
+    if (floodColor.b < 0 || floodColor.b > 255) return false;
 
     if (startingPosition.x_coord < 0 ||
       startingPosition.x_coord > width
@@ -157,7 +157,7 @@ const FloodFill = ({
               min={0}
               max={255}
               onChange={(e) => handleUpdateColor(e, 'red')}
-              value={floodColor.red}
+              value={floodColor.r}
             />
           </div>
           <div>
@@ -167,7 +167,7 @@ const FloodFill = ({
               min={0}
               max={255}
               onChange={(e) => handleUpdateColor(e, 'green')}
-              value={floodColor.green}
+              value={floodColor.g}
             />
           </div>
           <div>
@@ -177,7 +177,7 @@ const FloodFill = ({
               min={0}
               max={255}
               onChange={(e) => handleUpdateColor(e, 'blue')}
-              value={floodColor.blue}
+              value={floodColor.b}
             />
           </div>
         </div>

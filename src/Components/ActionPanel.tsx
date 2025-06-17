@@ -17,7 +17,7 @@ const ActionPanel = ({
   const [currentTab, setCurrentTab] = useState<string>('pixelate');
 
   //TODO set type
-  const [pixelsData, setPixelsData] = useState<number[][]>([])
+  const [pixelsData, setPixelsData] = useState<{ r: number, g: number, b: number, a: number }[]>([])
 
   const handleTabClick = (tabPage: string) => {
     setCurrentTab(tabPage)
@@ -56,7 +56,6 @@ const ActionPanel = ({
           <ColorDistribution
             canvasRef={canvasRef}
             imageAdded={imageAdded}
-            pixelsData={pixelsData}
             setPixelsData={setPixelsData}
           />
         </div>

@@ -23,7 +23,7 @@ import "../assets/stylings/_Quantization.css"
 interface QuantizationProps {
   canvasRef: React.RefObject<null>;
   imageAdded: boolean;
-  pixelsData: number[][]
+  pixelsData: { r: number, g: number, b: number, a: number }[];
 }
 
 const Quantization = ({
@@ -34,27 +34,12 @@ const Quantization = ({
 
   const quantizationCanvasRef = useRef(null);
   const [power, setPower] = useState(1);
-  const [quantizedColors, setQuantizedColors] = useState<number[][]>([]);
-  const nonTransparentPixels = pixelsData.filter((color) => color[3] !== 0);
-
+  const [quantizedColors, setQuantizedColors] = useState<{ r: number, g: number, b: number }[]>([]);
+  const nonTransparentPixels = pixelsData.filter((color) => color.a !== 0);
 
   const handleUpdatePower = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPower = Number(e.target.value);
     setPower(newPower);
-
-    // if (!canvasRef.current) {
-    //   return;
-    // }
-
-    // if (!quantizationCanvasRef.current) {
-    //   console.log('Remap: no canvas found');
-    //   return;
-    // }
-
-    // const colors = medianCut(nonTransparentPixels, newPower);
-    // const originalCanvas = canvasRef.current as HTMLCanvasElement;
-    // const mapCanvas = quantizationCanvasRef.current as HTMLCanvasElement;
-    // remapCanvas(originalCanvas, mapCanvas, colors);
   }
 
   const handleMedianCut = () => {
@@ -141,7 +126,7 @@ const Quantization = ({
             className="color-box"
             key={idx}
             style={{
-              backgroundColor: `rgba(${color[0]}, ${color[1]}, ${color[2]})`
+              backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b})`
             }}>
           </div>
         ))}

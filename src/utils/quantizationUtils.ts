@@ -1,12 +1,11 @@
-import { calculateEuclieanDistance } from "./utils";
+import { getEuclieanDistance } from "./utils";
 
-const RED = 0;
-const GREEN = 1;
-const BLUE = 2;
-
-export const medianCut = (pixelBucket: number[][], power: number) => {
+export const medianCut = (
+  pixelBucket: { r: number, g: number, b: number, a: number }[],
+  power: number
+) => {
   const cutBuckets = calculateMedianCut(pixelBucket, power);
-  const partitionedColors: number[][] = [];
+  const partitionedColors: { r: number, g: number, b: number }[] = [];
 
   cutBuckets.forEach(bucket => {
     partitionedColors.push(getAverageColor(bucket));
@@ -15,7 +14,9 @@ export const medianCut = (pixelBucket: number[][], power: number) => {
   return partitionedColors;
 }
 
-export const calculateMedianCut = (pixelBucket: number[][], power: number): number[][][] => {
+export const calculateMedianCut = (
+  pixelBucket: { r: number, g: number, b: number, a: number }[], power: number
+): { r: number, g: number, b: number, a: number }[][] => {
   // TOOD: edge case if pixelBucket is empty/1(?)
   if (power === 0) return [pixelBucket];
 
@@ -32,26 +33,26 @@ export const calculateMedianCut = (pixelBucket: number[][], power: number): numb
   return [...cutBucket1, ...cutBucket2];
 }
 
-const getGreatestRangeColor = (pixelBuck: number[][]) => {
-  const redRange = getRange(pixelBuck, 0);
-  const greenRange = getRange(pixelBuck, 1);
-  const blueRange = getRange(pixelBuck, 2);
+const getGreatestRangeColor = (pixelBucket: { r: number, g: number, b: number, a: number }[]) => {
+  const redRange = getRange(pixelBucket, "r");
+  const greenRange = getRange(pixelBucket, "g");
+  const blueRange = getRange(pixelBucket, "b");
 
   if (redRange >= greenRange && redRange >= blueRange) {
-    return RED;
+    return "r";
   } else if (greenRange >= redRange && greenRange >= blueRange) {
-    return GREEN;
+    return "g";
   } else {
-    return BLUE;
+    return "b";
   }
 }
 
-const getRange = (pixelBuck: number[][], idx: number) => {
+const getRange = (pixelBucket: { r: number, g: number, b: number, a: number }[], colorField: "r" | "g" | "b" | "a") => {
   let min = 255;
   let max = 0;
 
-  pixelBuck.forEach(pixel => {
-    const colorVal = pixel[idx];
+  pixelBucket.forEach(pixel => {
+    const colorVal = pixel[colorField];
 
     if (colorVal < min) {
       min = colorVal;
@@ -65,26 +66,30 @@ const getRange = (pixelBuck: number[][], idx: number) => {
   return max - min;
 }
 
-const getAverageColor = (pixels: number[][]) => {
+const getAverageColor = (pixels: { r: number, g: number, b: number }[]) => {
   let redSum = 0;
   let greenSum = 0;
   let blueSum = 0;
   const length = pixels.length;
 
   pixels.forEach((pixel) => {
-    redSum += pixel[0];
-    greenSum += pixel[1];
-    blueSum += pixel[2];
+    redSum += pixel.r;
+    greenSum += pixel.g;
+    blueSum += pixel.b;
   });
 
   const redAvg = Math.ceil(redSum / length);
   const greenAvg = Math.ceil(greenSum / length);
   const blueAvg = Math.ceil(blueSum / length);
 
-  return [redAvg, greenAvg, blueAvg];
+  return { r: redAvg, g: greenAvg, b: blueAvg };
 }
 
-export const remapCanvas = (originalCanvas: HTMLCanvasElement, mapCanvas: HTMLCanvasElement, quantizedColors: number[][]) => {
+export const remapCanvas = (
+  originalCanvas: HTMLCanvasElement,
+  mapCanvas: HTMLCanvasElement,
+  quantizedColors: { r: number, g: number, b: number }[]
+) => {
   console.log('start remapping')
   const coriginalCtx = originalCanvas.getContext('2d') as CanvasRenderingContext2D;
   const imageData = coriginalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
@@ -101,15 +106,14 @@ export const remapCanvas = (originalCanvas: HTMLCanvasElement, mapCanvas: HTMLCa
     const b = colorData[i + 2];
     // const a = colorData[i + 3];
 
-    const color = {red: r, green: g, blue: b};
+    const color = { r, g, b };
     let minDistance = 450;
-    let newColor = {red: 0, green: 0, blue: 0};
+    let newColor = { r: 0, g: 0, b: 0 };
     // const colorStr = `${r}, ${g}, ${b}`;
 
     for (let j = 0; j < quantizedColors.length; j++) {
-      const quantizedColor = quantizedColors[j];
-      const nextColor = {red: quantizedColor[0], green: quantizedColor[1], blue: quantizedColor[2]}
-      const currDistance = calculateEuclieanDistance(color, nextColor);
+      const nextColor = quantizedColors[j];
+      const currDistance = getEuclieanDistance(color, nextColor);
 
       if (currDistance < minDistance) {
         minDistance = currDistance;
@@ -117,9 +121,9 @@ export const remapCanvas = (originalCanvas: HTMLCanvasElement, mapCanvas: HTMLCa
       }
     }
 
-    mapColorData[i] = newColor.red;
-    mapColorData[i+1] = newColor.green;
-    mapColorData[i+2] = newColor.blue;
+    mapColorData[i] = newColor.r;
+    mapColorData[i + 1] = newColor.g;
+    mapColorData[i + 2] = newColor.b;
 
     // colorDistanceMapping
 

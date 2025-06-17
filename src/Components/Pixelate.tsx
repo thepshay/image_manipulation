@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { medianCut } from "../utils/quantizationUtils";
+import { copyCanvas } from "../utils/utils";
 
 interface PixelateProps {
   canvasRef: React.RefObject<null>;
   imageAdded: boolean;
-  pixelsData: number[][];
+  pixelsData: { r: number, g: number, b: number, a: number }[];
 }
 
 const Pixelate = ({
@@ -15,8 +16,23 @@ const Pixelate = ({
 
   const pixelateCanvasRev = useRef(null);
   const [power, setPower] = useState(1);
-  const nonTransparentPixels = pixelsData.filter((color) => color[3] !== 0);
+  const nonTransparentPixels = pixelsData.filter((color) => color.a !== 0);
   const [scaleToDownscale, setScaleToDownscale] = useState(4);
+
+  useEffect(() => {
+    if (!canvasRef.current) {
+      console.log('Flood: no canvas found');
+      return;
+    }
+
+    if (!imageAdded) {
+      return;
+    }
+
+    const canvas = canvasRef.current as HTMLCanvasElement;
+    copyCanvas(canvas, pixelateCanvasRev);
+  }, [imageAdded]);
+
 
   const handleUpdatePower = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newPower = Number(e.target.value);
@@ -30,12 +46,14 @@ const Pixelate = ({
 
     const originalCanvas = canvasRef.current as HTMLCanvasElement;
     const colorPalette = medianCut(nonTransparentPixels, power);
-    const pixelMatrix = getPixelMatrix(pixelsData, originalCanvas.width, originalCanvas.height);
+    // const pixelMatrix = getPixelMatrix(pixelsData, originalCanvas.width, originalCanvas.height);
 
-    const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, scaleToDownscale);
+    // const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, scaleToDownscale);
+
+    // console.log(downscalePixelMatrix)
   }
 
-  const getPixelMatrix = (colorData: number[][], width: number, height: number) => {
+  const getPixelMatrix = (colorData: Uint8ClampedArray<ArrayBufferLike>, width: number, height: number) => {
     const colorMatrix = [];
 
     for (let y = 0; y < height; y++) {
@@ -61,15 +79,28 @@ const Pixelate = ({
 
   const getDownscaleMatrix = (
     pixelMatrix: {
-      r: number[];
-      g: number[];
-      b: number[];
-      a: number[];
+      r: number;
+      g: number;
+      b: number;
+      a: number;
     }[][],
     scaleToDownscale: number
   ) => {
     const newHeight = Math.floor(pixelMatrix.length / scaleToDownscale);
-    const newWidth = Math.floor(pixelMatrix.length / scaleToDownscale);
+    const newWidth = Math.floor(pixelMatrix[0].length / scaleToDownscale);
+
+    const downscaleMatrix = [];
+
+    for (let i = 0; i < newHeight; i++) {
+      const row = [];
+      for (let j = 0; j < newWidth; j++) {
+        const pixel = pixelMatrix[i * scaleToDownscale][j * scaleToDownscale];
+        row.push(pixel);
+      }
+      downscaleMatrix.push(row);
+    }
+
+    return downscaleMatrix;
   }
 
   return (
@@ -97,9 +128,8 @@ const Pixelate = ({
         <br />
         <span>{power}</span>
       </div>
-
-
       <button onClick={handlePixelate}>Pixelate</button>
+      <br />
       <canvas
         id="pixelate-canvas"
         className={imageAdded ? "" : "hide"}

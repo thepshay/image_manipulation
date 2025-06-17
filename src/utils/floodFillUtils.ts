@@ -1,10 +1,10 @@
-import { calculateEuclieanDistance } from "./utils";
+import { getEuclieanDistance } from "./utils";
 
 interface FloodImageParams {
   floodColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   };
   startingPosition: {
     x_coord: number;
@@ -18,9 +18,9 @@ interface FloodImageParams {
 interface StackArrayFloodParams {
   ctx: CanvasRenderingContext2D;
   startingColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   };
   position: {
     x_coord: number;
@@ -32,9 +32,9 @@ interface StackArrayFloodParams {
 interface RecursiveFloodParams {
   ctx: CanvasRenderingContext2D;
   startingColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   };
   position: {
     x_coord: number;
@@ -50,9 +50,9 @@ interface ValidCoordParam {
   new_x: number;
   new_y: number;
   startingColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   };
   colorDistance: number;
 }
@@ -75,8 +75,8 @@ export const floodImage = async ({
   const floodCanvas = floodCanvasRef.current as HTMLCanvasElement;
   const ctx = floodCanvas.getContext('2d') as CanvasRenderingContext2D;
   const startingPositionData = ctx.getImageData(startingPosition.x_coord, startingPosition.y_coord, 1, 1);
-  const [red, green, blue] = startingPositionData.data
-  const startingColor = { red, green, blue };
+  const [r, g, b] = startingPositionData.data
+  const startingColor = { r, g, b };
   const path = getStackArrayFloodPath({
     ctx,
     startingColor,
@@ -99,9 +99,9 @@ const floodImageFromPath = (
     y_coord: number;
   }[],
   floodColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   }
 ) => {
   path.forEach((coord) => {
@@ -116,13 +116,13 @@ const colorIndividualPixel = (
     y_coord: number;
   },
   floodColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   }) => {
-  const { red, green, blue } = floodColor;
+  const { r, g, b } = floodColor;
   const { x_coord, y_coord } = coord;
-  ctx.fillStyle = `rgb(${red}, ${green}, ${blue})`;
+  ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
   ctx.fillRect(x_coord, y_coord, 1, 1);
 }
 
@@ -133,9 +133,9 @@ const animatedFloodPixels = async (
     y_coord: number;
   }[],
   floodColor: {
-    red: number;
-    green: number;
-    blue: number;
+    r: number;
+    g: number;
+    b: number;
   },
   speed: number = 1,
 ) => {
@@ -233,12 +233,12 @@ const validCoord = ({
   if (new_y < 0 || new_y >= height) return false;
 
   const imageData = ctx.getImageData(new_x, new_y, 1, 1);
-  const [red, green, blue] = imageData.data;
+  const [r, g, b] = imageData.data;
 
   if (!colorDistance) {
-    if (startingColor.red !== red || startingColor.green !== green || startingColor.blue !== blue) return false;
+    if (startingColor.r !== r || startingColor.g !== g || startingColor.b !== b) return false;
   } else {
-    const distance = calculateEuclieanDistance(startingColor, {red, green, blue });
+    const distance = getEuclieanDistance(startingColor, { r, g, b });
     return distance <= colorDistance;
   }
 

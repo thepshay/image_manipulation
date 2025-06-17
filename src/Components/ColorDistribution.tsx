@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 interface ColorDistributionProps {
   canvasRef: React.RefObject<null>,
   imageAdded: boolean;
-  pixelsData: number[][];
-  setPixelsData: (a: number[][]) => void;
+  setPixelsData: (a: { r: number, g: number, b: number, a: number }[]) => void;
 }
 
 const ColorDistribution = ({
@@ -23,8 +22,6 @@ const ColorDistribution = ({
       return;
     }
 
-    console.log('distribution useEffect')
-
     const canvas = canvasRef.current as HTMLCanvasElement;
     setTotalPixels(canvas.width * canvas.height)
 
@@ -32,10 +29,7 @@ const ColorDistribution = ({
   }, [imageAdded]);
 
   const calculateDistribution = (canvas: HTMLCanvasElement) => {
-    console.log('calculateDistribution')
-
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-
     const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height) as ImageData;
     const colorData = imageData.data;
 
@@ -50,7 +44,7 @@ const ColorDistribution = ({
 
       const rgba = `rgba(${r}, ${g}, ${b}, ${a})`;
 
-      const color = [r, g, b, a];
+      const color = { r, g, b, a };
       colorList.push(color);
 
       if (!colorCounter[rgba]) colorCounter[rgba] = 0;
@@ -58,10 +52,7 @@ const ColorDistribution = ({
     };
 
     setPixelsData(colorList);
-    console.log(colorCounter)
     setColorDistribution(colorCounter);
-
-    console.log(Object.keys(colorCounter).length);
   }
 
   const sortKeys = (dict: { [key: string]: number }, type: "desc" | "asc" = "desc"): string[] => {
