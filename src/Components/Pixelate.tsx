@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { medianCut } from "../utils/quantizationUtils";
-import { copyCanvas } from "../utils/utils";
+import { medianCut, remapCanvas } from "../utils/quantizationUtils";
+import { copyCanvas, fillCanvas, getPixelMatrix } from "../utils/utils";
+import { getDownscaleMatrix, getUpscalePixelMatrix, orderDither } from "../utils/pixelateUtils";
 
 interface PixelateProps {
   canvasRef: React.RefObject<null>;
@@ -17,7 +18,7 @@ const Pixelate = ({
   const pixelateCanvasRev = useRef(null);
   const [power, setPower] = useState(1);
   const nonTransparentPixels = pixelsData.filter((color) => color.a !== 0);
-  const [scaleToDownscale, setScaleToDownscale] = useState(4);
+  const [toBeScaled, setToBeScaled] = useState(4);
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -41,71 +42,31 @@ const Pixelate = ({
 
   const handlePixelate = () => {
     if (!canvasRef.current) {
+      console.log('no original canvas ref');
+      return;
+    }
+
+    if (!pixelateCanvasRev.current) {
+      console.log('no pixel canvas ref');
       return;
     }
 
     const originalCanvas = canvasRef.current as HTMLCanvasElement;
     const colorPalette = medianCut(nonTransparentPixels, power);
-    // const pixelMatrix = getPixelMatrix(pixelsData, originalCanvas.width, originalCanvas.height);
+    const pixelMatrix = getPixelMatrix(pixelsData, originalCanvas.width, originalCanvas.height);
+    const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, toBeScaled);
+    const ditheredMatrix = orderDither(downscalePixelMatrix, 4, colorPalette);
+    const upscalePixelMatrix = getUpscalePixelMatrix(ditheredMatrix, toBeScaled);
+    const mapCanvas = pixelateCanvasRev.current as HTMLCanvasElement
+    const ctx = mapCanvas.getContext('2d') as CanvasRenderingContext2D;
 
-    // const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, scaleToDownscale);
+    fillCanvas(ctx, upscalePixelMatrix, mapCanvas.width, mapCanvas.height);
 
-    // console.log(downscalePixelMatrix)
-  }
-
-  const getPixelMatrix = (colorData: Uint8ClampedArray<ArrayBufferLike>, width: number, height: number) => {
-    const colorMatrix = [];
-
-    for (let y = 0; y < height; y++) {
-      const row = [];
-
-      for (let x = 0; x < width; x++) {
-        const index = (y * width + x) * 4;
-
-        const r = colorData[index];
-        const g = colorData[index + 1];
-        const b = colorData[index + 2];
-        const a = colorData[index + 3];
-
-        const color = { r, g, b, a };
-        row.push(color);
-
-      }
-      colorMatrix.push(row);
-    }
-
-    return colorMatrix;
-  }
-
-  const getDownscaleMatrix = (
-    pixelMatrix: {
-      r: number;
-      g: number;
-      b: number;
-      a: number;
-    }[][],
-    scaleToDownscale: number
-  ) => {
-    const newHeight = Math.floor(pixelMatrix.length / scaleToDownscale);
-    const newWidth = Math.floor(pixelMatrix[0].length / scaleToDownscale);
-
-    const downscaleMatrix = [];
-
-    for (let i = 0; i < newHeight; i++) {
-      const row = [];
-      for (let j = 0; j < newWidth; j++) {
-        const pixel = pixelMatrix[i * scaleToDownscale][j * scaleToDownscale];
-        row.push(pixel);
-      }
-      downscaleMatrix.push(row);
-    }
-
-    return downscaleMatrix;
+    console.log('finish pixelate');
   }
 
   return (
     <div>
-
       <div>
         <input type="range"
           value={power}

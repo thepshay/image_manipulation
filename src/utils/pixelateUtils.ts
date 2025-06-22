@@ -6,14 +6,12 @@ export const orderDither = (
     r: number;
     g: number;
     b: number;
-    a: number;
   }[][],
   thresholdSize: number,
   palette: {
     r: number;
     g: number;
     b: number;
-    a: number;
   }[]
 ) => {
   const thresholdMatrix = getNormalizedBayerMatrix(thresholdSize) as number[][];
@@ -22,7 +20,6 @@ export const orderDither = (
   for (let y = 0; y < pixelMatrix.length; y++) {
     const row = [];
     for (let x = 0; x < pixelMatrix[0].length; x++) {
-
       const pixel = pixelMatrix[y][x];
       const factor = thresholdMatrix[x % thresholdSize][y % thresholdSize];
 
@@ -46,13 +43,11 @@ const mixingPlan = (
     r: number;
     g: number;
     b: number;
-    a: number;
   },
   palette: {
     r: number;
     g: number;
     b: number;
-    a: number;
   }[],
   thresholdSize: number,
 ) => {
@@ -115,12 +110,64 @@ const mixingPlan = (
 }
 
 const evaluateMixingError = (
-  inputColor: { r: number; g: number; b: number; a: number; },
+  inputColor: { r: number; g: number; b: number; },
   mixedColor: { r: number; g: number; b: number; },
-  color1: { r: number; g: number; b: number; a: number; },
-  color2: { r: number; g: number; b: number; a: number; },
+  color1: { r: number; g: number; b: number; },
+  color2: { r: number; g: number; b: number; },
   ratio: number,
 ) => {
   return getEuclieanDistance(inputColor, mixedColor) +
     getEuclieanDistance(color1, color2) * 0.1 + (Math.abs(ratio - 0.5) + 0.5);
 }
+
+export const getDownscaleMatrix = (
+  pixelMatrix: {
+    r: number;
+    g: number;
+    b: number;
+  }[][],
+  scale: number
+) => {
+  const newHeight = Math.floor(pixelMatrix.length / scale);
+  const newWidth = Math.floor(pixelMatrix[0].length / scale);
+
+  const downscaleMatrix = [];
+
+  for (let i = 0; i < newHeight; i++) {
+    const row = [];
+    for (let j = 0; j < newWidth; j++) {
+      const pixel = pixelMatrix[i * scale][j * scale];
+      row.push(pixel);
+    }
+    downscaleMatrix.push(row);
+  }
+
+  return downscaleMatrix;
+}
+
+export const getUpscalePixelMatrix = (
+  pixelMatrix: {
+    r: number;
+    g: number;
+    b: number;
+  }[][],
+  scale: number
+) => {
+
+  const upscaleMatrix = [];
+  for (let i = 0; i < pixelMatrix.length; i++) {
+    const row = [];
+    for (let j = 0; j < pixelMatrix[0].length; j++) {
+      const pixel = pixelMatrix[i][j];
+      for (let k = 0; k < scale; k++) {
+        row.push(pixel);
+      }
+    }
+    for (let k = 0; k < scale; k++) {
+      upscaleMatrix.push([...row]);
+    }
+  }
+
+  return upscaleMatrix;
+}
+
