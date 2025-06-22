@@ -9,6 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { copyCanvas } from '../utils/utils.ts'
 import { medianCut, remapCanvas } from "../utils/quantizationUtils.ts";
 import "../assets/stylings/_Quantization.css"
+import DownloadCanvas from "./DownloadCanvas.tsx";
 
 // Dithering -> reduce color pallete
 //   - Ordered Dithering -> https://en.wikipedia.org/wiki/Ordered_dithering
@@ -131,6 +132,11 @@ const Quantization = ({
           </div>
         ))}
       </div> : null}
+      {quantizationCanvasRef.current && imageAdded && 
+        <DownloadCanvas
+          canvas={quantizationCanvasRef.current}
+        />
+      }
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { medianCut, remapCanvas } from "../utils/quantizationUtils";
 import { copyCanvas, fillCanvas, getPixelMatrix } from "../utils/utils";
 import { getDownscaleMatrix, getUpscalePixelMatrix, orderDither } from "../utils/pixelateUtils";
+import DownloadCanvas from "./DownloadCanvas";
 
 interface PixelateProps {
   canvasRef: React.RefObject<null>;
@@ -15,7 +16,7 @@ const Pixelate = ({
   pixelsData,
 }: PixelateProps) => {
 
-  const pixelateCanvasRev = useRef(null);
+  const pixelateCanvasRef = useRef(null);
   const [power, setPower] = useState(1);
   const nonTransparentPixels = pixelsData.filter((color) => color.a !== 0);
   const [toBeScaled, setToBeScaled] = useState(4);
@@ -31,7 +32,7 @@ const Pixelate = ({
     }
 
     const canvas = canvasRef.current as HTMLCanvasElement;
-    copyCanvas(canvas, pixelateCanvasRev);
+    copyCanvas(canvas, pixelateCanvasRef);
   }, [imageAdded]);
 
 
@@ -46,7 +47,7 @@ const Pixelate = ({
       return;
     }
 
-    if (!pixelateCanvasRev.current) {
+    if (!pixelateCanvasRef.current) {
       console.log('no pixel canvas ref');
       return;
     }
@@ -57,7 +58,7 @@ const Pixelate = ({
     const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, toBeScaled);
     const ditheredMatrix = orderDither(downscalePixelMatrix, 4, colorPalette);
     const upscalePixelMatrix = getUpscalePixelMatrix(ditheredMatrix, toBeScaled);
-    const mapCanvas = pixelateCanvasRev.current as HTMLCanvasElement
+    const mapCanvas = pixelateCanvasRef.current as HTMLCanvasElement
     const ctx = mapCanvas.getContext('2d') as CanvasRenderingContext2D;
 
     fillCanvas(ctx, upscalePixelMatrix, mapCanvas.width, mapCanvas.height);
@@ -94,8 +95,13 @@ const Pixelate = ({
       <canvas
         id="pixelate-canvas"
         className={imageAdded ? "" : "hide"}
-        ref={pixelateCanvasRev}
+        ref={pixelateCanvasRef}
       ></canvas>
+      {pixelateCanvasRef.current && imageAdded &&
+        <DownloadCanvas
+          canvas={pixelateCanvasRef.current as HTMLCanvasElement}
+        />
+      }
     </div>
   )
 }

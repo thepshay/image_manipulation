@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { floodImage } from '../utils/floodFillUtils.js';
 import '../assets/stylings/_FloodFill.css';
 import { copyCanvas } from "../utils/utils.js";
+import DownloadCanvas from "./DownloadCanvas.js";
 
 interface FloodFillProps {
   canvasRef: React.RefObject<null>;
@@ -247,6 +248,11 @@ const FloodFill = ({
           onClick={!isLoading ? handleClickCanvas : () => { }}
         ></canvas>
       </div>
+      {floodCanvasRef.current && imageAdded &&
+        <DownloadCanvas
+          canvas={floodCanvasRef.current}
+        />
+      }
     </div>
   )
 }
