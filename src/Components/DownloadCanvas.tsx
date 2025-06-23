@@ -1,4 +1,4 @@
-import "../assets/_DownloadCanvas.css";
+import "../assets/stylings/_DownloadCanvas.css";
 
 interface DownloadCanvasProps {
   canvas: HTMLCanvasElement;

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
-import { medianCut, remapCanvas } from "../utils/quantizationUtils";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { medianCut } from "../utils/quantizationUtils";
 import { copyCanvas, fillCanvas, getPixelMatrix } from "../utils/utils";
 import { getDownscaleMatrix, getUpscalePixelMatrix, orderDither } from "../utils/pixelateUtils";
 import DownloadCanvas from "./DownloadCanvas";
+import '../assets/stylings/_Pixelate.css';
 
 interface PixelateProps {
   canvasRef: React.RefObject<null>;
@@ -19,7 +20,7 @@ const Pixelate = ({
   const pixelateCanvasRef = useRef(null);
   const [power, setPower] = useState(1);
   const nonTransparentPixels = pixelsData.filter((color) => color.a !== 0);
-  const [toBeScaled, setToBeScaled] = useState(4);
+  const [pixelSize, setPixelSize] = useState(4);
 
   useEffect(() => {
     if (!canvasRef.current) {
@@ -55,9 +56,9 @@ const Pixelate = ({
     const originalCanvas = canvasRef.current as HTMLCanvasElement;
     const colorPalette = medianCut(nonTransparentPixels, power);
     const pixelMatrix = getPixelMatrix(pixelsData, originalCanvas.width, originalCanvas.height);
-    const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, toBeScaled);
+    const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, pixelSize);
     const ditheredMatrix = orderDither(downscalePixelMatrix, 4, colorPalette);
-    const upscalePixelMatrix = getUpscalePixelMatrix(ditheredMatrix, toBeScaled);
+    const upscalePixelMatrix = getUpscalePixelMatrix(ditheredMatrix, pixelSize);
     const mapCanvas = pixelateCanvasRef.current as HTMLCanvasElement
     const ctx = mapCanvas.getContext('2d') as CanvasRenderingContext2D;
 
@@ -66,30 +67,59 @@ const Pixelate = ({
     console.log('finish pixelate');
   }
 
+  const updatePixelSize = (e: ChangeEvent<HTMLInputElement>) => {
+    const newSize = Number(e.target.value);
+    setPixelSize(newSize);
+  }
+
   return (
     <div>
       <div>
-        <input type="range"
-          value={power}
-          min="0"
-          max="8"
-          list="power"
-          onChange={handleUpdatePower}
-        />
-        <datalist id='power'>
-          <option value="0" />
-          <option value="1" />
-          <option value="2" />
-          <option value="3" />
-          <option value="4" />
-          <option value="5" />
-          <option value="6" />
-          <option value="7" />
-          <option value="8" />
-        </datalist>
-        <br />
-        <span>{power}</span>
+        <div className="control-container">
+          <div>
+            <div>Color Palette (base 2 scale)</div>
+            <div className="radio-container">
+              {new Array(9).fill(null).map((_, idx) => {
+                const value = idx;
+                return (
+                  <div key={idx} className="radio-item">
+                    <input
+                      type='radio'
+                      id={`size-${value}`}
+                      value={value}
+                      checked={value === power}
+                      onChange={handleUpdatePower}
+                    />
+                    <label htmlFor={`size-${value}`}>{value}</label>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+          <br />
+        </div>
+        <div>
+          <div>Pixel Size</div>
+          <div className="radio-container">
+            {new Array(9).fill(null).map((_, idx) => {
+              const value = idx * idx;
+              return (
+                <div key={idx} className="radio-item">
+                  <input
+                    type='radio'
+                    id={`size-${value}`}
+                    value={value}
+                    checked={value === pixelSize}
+                    onChange={updatePixelSize}
+                  />
+                  <label htmlFor={`size-${value}`}>{value}</label>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
+      <br />
       <button onClick={handlePixelate}>Pixelate</button>
       <br />
       <canvas
