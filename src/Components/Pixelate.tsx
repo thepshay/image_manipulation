@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ChangeEvent, type SelectHTMLAttributes } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 import { medianCut } from "../utils/quantizationUtils";
 import { copyCanvas, fillCanvas, getPixelMatrix } from "../utils/utils";
 import { getDownscaleMatrix, getUpscalePixelMatrix, orderDither } from "../utils/pixelateUtils";
@@ -9,12 +9,14 @@ interface PixelateProps {
   canvasRef: React.RefObject<null>;
   imageAdded: boolean;
   pixelsData: { r: number, g: number, b: number, a: number }[];
+  imageName: string;
 }
 
 const Pixelate = ({
   canvasRef,
   imageAdded,
   pixelsData,
+  imageName,
 }: PixelateProps) => {
   const DOWN_DITHER_UP = 0;
   const DITHER_DOWN_UP = 1;
@@ -129,7 +131,7 @@ const Pixelate = ({
                       checked={value === power}
                       onChange={handleUpdatePower}
                     />
-                    <label htmlFor={`size-${value}`}>{value}</label>
+                    <label htmlFor={`size-${value}`}>{Math.pow(2, idx)}</label>
                   </div>
                 )
               })}
@@ -180,6 +182,7 @@ const Pixelate = ({
       {pixelateCanvasRef.current && imageAdded &&
         <DownloadCanvas
           canvas={pixelateCanvasRef.current as HTMLCanvasElement}
+          imageName={`${imageName}_Pixelate_${pixelateType}_c${Math.pow(2, power)}_s${pixelSize}`}
         />
       }
     </div>

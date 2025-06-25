@@ -8,15 +8,15 @@ import Pixelate from './Pixelate';
 interface ActionPanelProps {
   imageAdded: boolean,
   canvasRef: React.RefObject<null>,
+  imageName: string,
 }
 
 const ActionPanel = ({
   imageAdded,
   canvasRef,
+  imageName,
 }: ActionPanelProps) => {
   const [currentTab, setCurrentTab] = useState<string>('pixelate');
-
-  //TODO set type
   const [pixelsData, setPixelsData] = useState<{ r: number, g: number, b: number, a: number }[]>([])
 
   const handleTabClick = (tabPage: string) => {
@@ -63,6 +63,7 @@ const ActionPanel = ({
           <FloodFill
             canvasRef={canvasRef}
             imageAdded={imageAdded}
+            imageName={imageName}
           />
         </div>
         <div className={`${currentTab === 'quantization' ? '' : 'hide'}`}>
@@ -70,6 +71,7 @@ const ActionPanel = ({
             canvasRef={canvasRef}
             imageAdded={imageAdded}
             pixelsData={pixelsData}
+            imageName={imageName}
           />
         </div>
         <div className={`${currentTab === 'pixelate' ? '' : 'hide'}`}>
@@ -77,6 +79,7 @@ const ActionPanel = ({
             canvasRef={canvasRef}
             imageAdded={imageAdded}
             pixelsData={pixelsData}
+            imageName={imageName}
           />
         </div>
       </div>

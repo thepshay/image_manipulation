@@ -2,17 +2,20 @@ import "../assets/stylings/_DownloadCanvas.css";
 
 interface DownloadCanvasProps {
   canvas: HTMLCanvasElement;
+  imageName?: string;
 }
 
 const DownloadCanvas = ({
   canvas,
+  imageName,
 }: DownloadCanvasProps) => {
+  const fileName = imageName || "new_image";
 
   const handleDownload = () => {
     console.log('handle download');
 
     const link = document.createElement('a');
-    link.download = "new-image.png";
+    link.download = `${fileName}` + ".png";
     link.href = canvas.toDataURL();
     link.click();
   }

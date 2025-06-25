@@ -6,6 +6,7 @@ interface ImageInputContainerProps {
   setImageAdded: (a: boolean) => void;
   canvasRef: React.RefObject<null>;
   setResetKey: (a: number | { (arg1: number): number }) => void;
+  setImageName: (a: string) => void;
 }
 
 const ImageInputContainer = ({
@@ -13,6 +14,7 @@ const ImageInputContainer = ({
   setImageAdded,
   canvasRef,
   setResetKey,
+  setImageName,
 }: ImageInputContainerProps) => {
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,13 +23,15 @@ const ImageInputContainer = ({
       console.log('no file selected');
       return;
     }
+   
+    const fileName = file.name.split('.')[0];
+    setImageName(fileName);
 
     const reader = new FileReader();
     reader.readAsDataURL(file);
 
     reader.onload = (e: Event) => {
       const imageBase64 = (e.target as FileReader)?.result;
-
       loadImageOnCanvas(imageBase64 as string);
     }
   }

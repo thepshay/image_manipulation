@@ -8,11 +8,13 @@ import DownloadCanvas from "./DownloadCanvas.js";
 interface FloodFillProps {
   canvasRef: React.RefObject<null>;
   imageAdded: boolean;
+  imageName: string;
 }
 
 const FloodFill = ({
   canvasRef,
   imageAdded,
+  imageName,
 }: FloodFillProps) => {
 
   const DEFAULT_RED = 0;
@@ -251,6 +253,7 @@ const FloodFill = ({
       {floodCanvasRef.current && imageAdded &&
         <DownloadCanvas
           canvas={floodCanvasRef.current}
+          imageName={`${imageName}_FloodFill`}
         />
       }
     </div>

@@ -25,12 +25,14 @@ interface QuantizationProps {
   canvasRef: React.RefObject<null>;
   imageAdded: boolean;
   pixelsData: { r: number, g: number, b: number, a: number }[];
+  imageName: string;
 }
 
 const Quantization = ({
   canvasRef,
   imageAdded,
   pixelsData,
+  imageName,
 }: QuantizationProps) => {
 
   const quantizationCanvasRef = useRef(null);
@@ -135,6 +137,7 @@ const Quantization = ({
       {quantizationCanvasRef.current && imageAdded && 
         <DownloadCanvas
           canvas={quantizationCanvasRef.current}
+          imageName={`${imageName}_Quantization_${power}`}
         />
       }
     </div>
