@@ -6,6 +6,7 @@ export const orderDither = (
     r: number;
     g: number;
     b: number;
+    a: number;
   }[][],
   thresholdSize: number,
   palette: {
@@ -21,15 +22,20 @@ export const orderDither = (
     const row = [];
     for (let x = 0; x < pixelMatrix[0].length; x++) {
       const pixel = pixelMatrix[y][x];
-      const factor = thresholdMatrix[x % thresholdSize][y % thresholdSize];
 
-      const result = mixingPlan(pixel, palette, thresholdSize);
-      const { palette_index1, palette_index2, ratio } = result;
-
-      if (factor < ratio) {
-        row.push(palette[palette_index2]);
+      if (pixel.a === 0) {
+        row.push(pixel);
       } else {
-        row.push(palette[palette_index1]);
+        const factor = thresholdMatrix[x % thresholdSize][y % thresholdSize];
+
+        const result = mixingPlan(pixel, palette, thresholdSize);
+        const { palette_index1, palette_index2, ratio } = result;
+
+        if (factor < ratio) {
+          row.push({ ...palette[palette_index2], a: 255 });
+        } else {
+          row.push({ ...palette[palette_index1], a: 255 });
+        }
       }
     }
     ditheredPixels.push(row);
@@ -125,6 +131,7 @@ export const getDownscaleMatrix = (
     r: number;
     g: number;
     b: number;
+    a: number;
   }[][],
   scale: number
 ) => {
@@ -150,6 +157,7 @@ export const getUpscalePixelMatrix = (
     r: number;
     g: number;
     b: number;
+    a: number;
   }[][],
   scale: number
 ) => {

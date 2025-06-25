@@ -53,6 +53,7 @@ export const getPixelMatrix = (pixelsData: {
   r: number;
   g: number;
   b: number;
+  a: number;
 }[],
   width: number,
   height: number
@@ -82,7 +83,7 @@ export const fillCanvas = (canvas: HTMLCanvasElement, newPixels: any[][]) => {
       const color = newPixels[y][x];
 
       if (color) {
-        ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
+        ctx.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b}, ${color.a})`;
         ctx.fillRect(x, y, 1, 1);
       }
     }

@@ -80,6 +80,7 @@ const Pixelate = ({
       r: number,
       g: number,
       b: number,
+      a: number,
     }[][],
     colorPalette: {
       r: number,
