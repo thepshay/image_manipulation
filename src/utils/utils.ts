@@ -72,9 +72,13 @@ export const getPixelMatrix = (pixelsData: {
 }
 
 
-export const fillCanvas = (ctx: CanvasRenderingContext2D, newPixels: any[][], width: number, height: number) => {
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
+export const fillCanvas = (canvas: HTMLCanvasElement, newPixels: any[][]) => {
+  const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+  canvas.height = newPixels.length;
+  canvas.width = newPixels[0].length;
+
+  for (let y = 0; y < newPixels.length; y++) {
+    for (let x = 0; x < newPixels[0].length; x++) {
       const color = newPixels[y][x];
 
       if (color) {

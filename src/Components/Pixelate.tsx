@@ -65,15 +65,10 @@ const Pixelate = ({
     const originalCanvas = canvasRef.current as HTMLCanvasElement;
     const colorPalette = medianCut(nonTransparentPixels, power);
     const pixelMatrix = getPixelMatrix(pixelsData, originalCanvas.width, originalCanvas.height);
-
-    // 3. downscale -> euclidean mapping -> upscale
-
     const mapCanvas = pixelateCanvasRef.current as HTMLCanvasElement
-    const ctx = mapCanvas.getContext('2d') as CanvasRenderingContext2D;
-
     const processedMatrix = handlePixelation(pixelMatrix, colorPalette);
 
-    fillCanvas(ctx, processedMatrix, mapCanvas.width, mapCanvas.height);
+    fillCanvas(mapCanvas, processedMatrix);
 
     console.log('finish pixelate');
   }
@@ -174,7 +169,8 @@ const Pixelate = ({
         </div>
       </div>
       <br />
-      <button onClick={handlePixelateDownDitherUp}>Pixelate Down Dither Up</button>
+      <button onClick={handlePixelateDownDitherUp}>Pixelate</button>
+      <br />
       <br />
       <canvas
         id="pixelate-canvas"
