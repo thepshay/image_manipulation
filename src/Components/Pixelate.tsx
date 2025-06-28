@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
-import { medianCut } from "../utils/quantizationUtils";
+import { getDistanceMappingPixels, medianCut } from "../utils/quantizationUtils";
 import { copyCanvas, fillCanvas, getPixelMatrix } from "../utils/utils";
 import { getDownscaleMatrix, getUpscalePixelMatrix, orderDither } from "../utils/pixelateUtils";
 import DownloadCanvas from "./DownloadCanvas";
@@ -22,7 +22,6 @@ const Pixelate = ({
   const DITHER_DOWN_UP = 1;
   const DOWN_UP = 2;
   const DOWN_DIST_UP = 3;
-  const DIST_DOWN_UP = 4;
 
   const pixelateCanvasRef = useRef(null);
   const [power, setPower] = useState(3);
@@ -87,26 +86,30 @@ const Pixelate = ({
       g: number,
       b: number,
     }[]) => {
-    let returnMatrix;
-
     if (pixelateType === DOWN_DITHER_UP) {
       // 1. downscale -> dither -> upscale
       const downscalePixelMatrix = getDownscaleMatrix(pixelMatrix, pixelSize);
       const ditheredMatrix = orderDither(downscalePixelMatrix, 4, colorPalette);
-      returnMatrix = getUpscalePixelMatrix(ditheredMatrix, pixelSize);
+
+      return getUpscalePixelMatrix(ditheredMatrix, pixelSize);
     } else if (pixelateType === DITHER_DOWN_UP) {
       // 2. dither -> downscale -> upscale
       const ditheredMatrix = orderDither(pixelMatrix, 4, colorPalette);
       const downscaledMatrix = getDownscaleMatrix(ditheredMatrix, pixelSize);
-      returnMatrix = getUpscalePixelMatrix(downscaledMatrix, pixelSize);
+
+      return getUpscalePixelMatrix(downscaledMatrix, pixelSize);
     } else if (pixelateType === DOWN_UP) {
       const downscaledMatrix = getDownscaleMatrix(pixelMatrix, pixelSize);
-      returnMatrix = getUpscalePixelMatrix(downscaledMatrix, pixelSize);
-    } else {
-      returnMatrix = pixelMatrix;
-    }
 
-    return returnMatrix;
+      return getUpscalePixelMatrix(downscaledMatrix, pixelSize);
+    } else if (pixelateType === DOWN_DIST_UP) {
+      const downscaledMatrix = getDownscaleMatrix(pixelMatrix, pixelSize);
+      const distanceMappingMatrix = getDistanceMappingPixels(downscaledMatrix, colorPalette);
+
+      return getUpscalePixelMatrix(distanceMappingMatrix, pixelSize);
+    } else {
+      return pixelMatrix;
+    }
   }
 
   const updatePixelSize = (e: ChangeEvent<HTMLInputElement>) => {
@@ -161,7 +164,6 @@ const Pixelate = ({
             <option value={DITHER_DOWN_UP}>Dither | Downscale | Upscale</option>
             <option value={DOWN_UP}>Downscale | Upscale</option>
             <option value={DOWN_DIST_UP}>Downscale | Distance | Upscale</option>
-            <option value={DIST_DOWN_UP}>Distance | Downscale | Upscale</option>
           </select>
         </div>
       </div>

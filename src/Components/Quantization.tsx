@@ -6,8 +6,8 @@
 
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
-import { copyCanvas } from '../utils/utils.ts'
-import { medianCut, remapCanvas } from "../utils/quantizationUtils.ts";
+import { copyCanvas, fillCanvas, getPixelMatrix } from '../utils/utils.ts'
+import { medianCut, getDistanceMappingPixels} from "../utils/quantizationUtils.ts";
 import "../assets/stylings/_Quantization.css"
 import DownloadCanvas from "./DownloadCanvas.tsx";
 
@@ -51,18 +51,16 @@ const Quantization = ({
   }
 
   const handleRemapColors = () => {
-    if (!canvasRef.current) {
-      return;
-    }
-
     if (!quantizationCanvasRef.current) {
       console.log('Remap: no canvas found');
       return;
     }
 
-    const originalCanvas = canvasRef.current as HTMLCanvasElement;
     const mapCanvas = quantizationCanvasRef.current as HTMLCanvasElement;
-    remapCanvas(originalCanvas, mapCanvas, quantizedColors);
+    const pixelMatrix = getPixelMatrix(pixelsData, mapCanvas.height, mapCanvas.width);
+
+    const distanceMappingPixels = getDistanceMappingPixels(pixelMatrix, quantizedColors);
+    fillCanvas(mapCanvas, distanceMappingPixels);
   }
 
   useEffect(() => {

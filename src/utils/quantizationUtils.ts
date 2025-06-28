@@ -85,50 +85,43 @@ const getAverageColor = (pixels: { r: number, g: number, b: number }[]) => {
   return { r: redAvg, g: greenAvg, b: blueAvg };
 }
 
-export const remapCanvas = (
-  originalCanvas: HTMLCanvasElement,
-  mapCanvas: HTMLCanvasElement,
-  quantizedColors: { r: number, g: number, b: number }[]
+export const getDistanceMappingPixels = (
+  pixelsData: {
+    r: number, g: number, b: number, a: number
+  }[][],
+  quantizedColors: {
+    r: number, g: number, b: number
+  }[],
 ) => {
-  console.log('start remapping')
-  const coriginalCtx = originalCanvas.getContext('2d') as CanvasRenderingContext2D;
-  const imageData = coriginalCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
-  const colorData = imageData.data;
+  const distanceMappingPixels = [];
 
-  const mapCtx = mapCanvas.getContext('2d') as CanvasRenderingContext2D;
-  const mapImageData = mapCtx.getImageData(0, 0, originalCanvas.width, originalCanvas.height);
-  const mapColorData = mapImageData.data;
-  // const distanceMapping = {};
+  for (let row = 0; row < pixelsData.length; row++) {
+    const newRow = [];
 
-  for (let i = 0; i < colorData.length; i += 4) {
-    const r = colorData[i];
-    const g = colorData[i + 1];
-    const b = colorData[i + 2];
-    // const a = colorData[i + 3];
+    for (let col = 0; col < pixelsData[0].length; col++) {
+      let minDistance = 1e99;
+      let nextColor = { r: 0, g: 0, b: 0 };
+      const currColor = pixelsData[row][col];
 
-    const color = { r, g, b };
-    let minDistance = 450;
-    let newColor = { r: 0, g: 0, b: 0 };
-    // const colorStr = `${r}, ${g}, ${b}`;
+      if (currColor.a === 0) {
+        newRow.push(currColor);
+      } else {
+        for (let i = 0; i < quantizedColors.length; i++) {
+          const distance = getEuclieanDistance(currColor, quantizedColors[i]);
 
-    for (let j = 0; j < quantizedColors.length; j++) {
-      const nextColor = quantizedColors[j];
-      const currDistance = getEuclieanDistance(color, nextColor);
+          if (distance < minDistance) {
+            minDistance = distance;
+            nextColor = quantizedColors[i];
+          }
+        }
 
-      if (currDistance < minDistance) {
-        minDistance = currDistance;
-        newColor = nextColor;
+        newRow.push({ ...nextColor, a: 255 })
       }
+
     }
 
-    mapColorData[i] = newColor.r;
-    mapColorData[i + 1] = newColor.g;
-    mapColorData[i + 2] = newColor.b;
-
-    // colorDistanceMapping
-
+    distanceMappingPixels.push(newRow);
   }
 
-  mapCtx.putImageData(mapImageData, 0, 0);
-  console.log('finish remapping')
+  return distanceMappingPixels;
 }
