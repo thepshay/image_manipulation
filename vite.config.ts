@@ -6,5 +6,6 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 1337
-  }
+  },
+  base: "/image_manipulation"
 })
