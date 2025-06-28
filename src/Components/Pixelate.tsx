@@ -143,21 +143,15 @@ const Pixelate = ({
         <div>
           <div>Pixel Size</div>
           <div className="radio-container">
-            {new Array(9).fill(null).map((_, idx) => {
-              const value = Math.pow(2, idx);
-              return (
-                <div key={idx} className="radio-item">
-                  <input
-                    type='radio'
-                    id={`size-${value}`}
-                    value={value}
-                    checked={value === pixelSize}
-                    onChange={updatePixelSize}
-                  />
-                  <label htmlFor={`size-${value}`}>{value}</label>
-                </div>
+            <input type="range" value={pixelSize} min='1' max='24' list='pixel-size' onChange={updatePixelSize} />
+            <datalist id='pixel-size'>
+              {new Array(24).fill(null).map((val, idx) => {
+                return (
+                  <option key={idx} value={val} />
               )
-            })}
+              })}
+            </datalist>
+            <div>{pixelSize}</div>
           </div>
         </div>
         <div>
