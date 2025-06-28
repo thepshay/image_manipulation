@@ -8,4 +8,4 @@ RUN bun install --frozen-lockfile
 
 EXPOSE 1337 
 
-CMD ["bun", "run", "dev"]
+CMD ["bun", "run", "dev-docker"]
