@@ -122,7 +122,7 @@ const Pixelate = ({
       <div>
         <div className="control-container">
           <div>
-            <div>Color Palette (base 2 scale)</div>
+            <div>Palette Count</div>
             <div className="radio-container">
               {new Array(9).fill(null).map((_, idx) => {
                 const value = idx;
